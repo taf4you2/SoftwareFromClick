@@ -1,4 +1,4 @@
-﻿<Window x:Class="SoftwareFromClick.MainWindow"
+﻿<Window x:Class="SoftwareFromClick.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="SoftwareFromClick" Height="600" Width="900">
@@ -33,7 +33,7 @@
 
             <!-- Settings Button -->
             <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="5">
-                <Button Content="settings" Height="30" Margin="5"/>
+                <Button Content="settings" Height="30" Margin="5" Click="SettingsButton_Click"/>
             </Border>
         </Grid>
 
@@ -53,7 +53,7 @@
                     <StackPanel Margin="10">
                         <TextBlock Text="Select AI Model" Margin="0,0,0,5" TextAlignment="Center"/>
                         <Border BorderBrush="Black" BorderThickness="1">
-                            <ComboBox Width="120" Height="40" BorderThickness="0">
+                            <ComboBox Width="120" Height="22" BorderThickness="0">
                                 <ComboBoxItem Content="GPT-5.0"/>
                             </ComboBox>
                         </Border>
@@ -63,7 +63,7 @@
                     <StackPanel Margin="10">
                         <TextBlock Text="Select Language" Margin="0,0,0,5" TextAlignment="Center"/>
                         <Border BorderBrush="Black" BorderThickness="1">
-                            <ComboBox Width="120" Height="40" BorderThickness="0">
+                            <ComboBox Width="120" Height="22" BorderThickness="0">
                                 <ComboBoxItem Content="C#"/>
                             </ComboBox>
                         </Border>
@@ -73,7 +73,7 @@
                     <StackPanel Margin="10">
                         <TextBlock Text="Select Type" Margin="0,0,0,5" TextAlignment="Center"/>
                         <Border BorderBrush="Black" BorderThickness="1">
-                            <ComboBox Width="120" Height="40" BorderThickness="0">
+                            <ComboBox Width="120" Height="22" BorderThickness="0">
                                 <ComboBoxItem Content="Class"/>
                                 <ComboBoxItem Content="Function"/>
                             </ComboBox>
