@@ -22,6 +22,9 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="20"/>
                     <RowDefinition Height="Auto"/>
+                    <!-- Preview Panel -->
+                    <RowDefinition Height="*"/>
+                    <!-- Ten wiersz zajmie całą pozostałą przestrzeń -->
                 </Grid.RowDefinitions>
 
                 <!-- Header -->
@@ -71,7 +74,7 @@
                                  TextWrapping="Wrap" 
                                  VerticalScrollBarVisibility="Auto"
                                  BorderThickness="0"
-                                 ToolTip="e.g. int number, string text" TextChanged="TextBox_TextChanged"/>
+                                 ToolTip="e.g. int number, string text"/>
                     </Border>
                 </StackPanel>
 
@@ -83,8 +86,34 @@
                     </Border>
                 </StackPanel>
 
+                <!-- Preview Prompt Panel -->
+                <Border x:Name="PromptPreviewPanel" 
+                        Grid.Row="12" 
+                        BorderBrush="Black" 
+                        BorderThickness="1" 
+                        Visibility="Collapsed"
+                        Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Prompt Preview:" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <Border BorderBrush="Black" BorderThickness="1">
+                            <TextBox x:Name="PromptPreviewTextBox"
+                                       Height="200" 
+                                       AcceptsReturn="True" 
+                                       TextWrapping="Wrap" 
+                                       VerticalScrollBarVisibility="Auto"
+                                       BorderThickness="0"
+                                       IsReadOnly="False"
+                                       Background="White"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
                 <!-- Buttons -->
-                <StackPanel Grid.Row="12" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <StackPanel Grid.Row="13" 
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Bottom"
+                            Margin="0,20,0,0">
                     <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,10,0">
                         <Button Content="Back" Width="100" Height="35" BorderThickness="0" Click="BackButton_Click"/>
                     </Border>
@@ -92,7 +121,7 @@
                         <Button Content="Preview Prompt" Width="120" Height="35" BorderThickness="0" Click="PreviewPromptButton_Click"/>
                     </Border>
                     <Border BorderBrush="Black" BorderThickness="1">
-                        <Button Content="Generate Code" Width="120" Height="35" BorderThickness="0" Click="GenerateCodeButton_Click"/>
+                        <Button Content="Generate Code" Width="120" Height="35" BorderThickness="0"/>
                     </Border>
                 </StackPanel>
             </Grid>

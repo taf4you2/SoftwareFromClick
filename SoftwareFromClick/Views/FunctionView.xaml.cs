@@ -20,6 +20,7 @@ namespace SoftwareFromClick.Views
     public partial class FunctionView : UserControl
     {
         private MainWindow _mainWindow;
+        private bool _isPromptVisible = false;
 
         public FunctionView(MainWindow mainWindow)
         {
@@ -34,7 +35,17 @@ namespace SoftwareFromClick.Views
 
         private void PreviewPromptButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_isPromptVisible)
+            {
 
+                PromptPreviewPanel.Visibility = Visibility.Collapsed;
+                _isPromptVisible = false;
+            }
+            else
+            {
+                PromptPreviewPanel.Visibility = Visibility.Visible;
+                _isPromptVisible = true;
+            }
         }
 
         private void GenerateCodeButton_Click(object sender, RoutedEventArgs e)
