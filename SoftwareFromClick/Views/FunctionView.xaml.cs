@@ -17,11 +17,30 @@ namespace SoftwareFromClick.Views
     /// <summary>
     /// Interaction logic for FunctionView.xaml
     /// </summary>
-    public partial class FunctionView : Window
+    public partial class FunctionView : UserControl
     {
-        public FunctionView()
+        private MainWindow _mainWindow;
+
+        public FunctionView(MainWindow mainWindow)
         {
             InitializeComponent();
+            _mainWindow = mainWindow;
         }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            _mainWindow.ShowWelcomeScreen();
+        }
+
+        private void PreviewPromptButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void GenerateCodeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
     }
 }

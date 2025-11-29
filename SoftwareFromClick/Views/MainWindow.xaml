@@ -24,8 +24,6 @@
                             <ListViewItem Content="query"/>
                             <ListViewItem Content="query"/>
                             <ListViewItem Content="query"/>
-                            <ListViewItem Content="query"/>
-                            <ListViewItem Content="query"/>
                         </ListView>
                     </StackPanel>
                 </ScrollViewer>
@@ -37,57 +35,60 @@
             </Border>
         </Grid>
 
-        <!-- Right column -->
-        <Grid Grid.Column="1">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+        <!-- Right column - ContentControl for switching views -->
+        <ContentControl x:Name="MainContentControl" Grid.Column="1">
+            <!-- Welcome screen -->
+            <Grid>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
-                <!-- Welcome text -->
-                <Border BorderBrush="Black" BorderThickness="1" Padding="20" Margin="0,0,0,40">
-                    <TextBlock Text="Welcome to SoftwareFromClick" FontSize="16" TextAlignment="Center"/>
-                </Border>
+                    <!-- Welcome text -->
+                    <Border BorderBrush="Black" BorderThickness="1" Padding="20" Margin="0,0,0,40">
+                        <TextBlock Text="Welcome to SoftwareFromClick" FontSize="16" TextAlignment="Center"/>
+                    </Border>
 
-                <!-- ComboBoxes container -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,40">
+                    <!-- ComboBoxes container -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,40">
 
-                    <!-- "AI Model" ComboBox -->
-                    <StackPanel Margin="10">
-                        <TextBlock Text="Select AI Model" Margin="0,0,0,5" TextAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1">
-                            <ComboBox Width="120" Height="22" BorderThickness="0">
-                                <ComboBoxItem Content="GPT-5.0"/>
-                            </ComboBox>
-                        </Border>
+                        <!-- First ComboBox -->
+                        <StackPanel Margin="10">
+                            <TextBlock Text="Select AI Model" Margin="0,0,0,5" TextAlignment="Center"/>
+                            <Border BorderBrush="Black" BorderThickness="1">
+                                <ComboBox x:Name="ModelComboBox" Width="120" Height="22" BorderThickness="0">
+                                    <ComboBoxItem Content="GPT-5.0"/>
+                                </ComboBox>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Second ComboBox -->
+                        <StackPanel Margin="10">
+                            <TextBlock Text="Select Language" Margin="0,0,0,5" TextAlignment="Center"/>
+                            <Border BorderBrush="Black" BorderThickness="1">
+                                <ComboBox x:Name="LanguageComboBox" Width="120" Height="22" BorderThickness="0">
+                                    <ComboBoxItem Content="C#"/>
+                                </ComboBox>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Third ComboBox -->
+                        <StackPanel Margin="10">
+                            <TextBlock Text="Select Type" Margin="0,0,0,5" TextAlignment="Center"/>
+                            <Border BorderBrush="Black" BorderThickness="1">
+                                <ComboBox x:Name="TypeComboBox" Width="120" Height="22" BorderThickness="0">
+                                    <ComboBoxItem Content="Class"/>
+                                    <ComboBoxItem Content="Function"/>
+                                </ComboBox>
+                            </Border>
+                        </StackPanel>
+
                     </StackPanel>
 
-                    <!-- "Language" ComboBox -->
-                    <StackPanel Margin="10">
-                        <TextBlock Text="Select Language" Margin="0,0,0,5" TextAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1">
-                            <ComboBox Width="120" Height="22" BorderThickness="0">
-                                <ComboBoxItem Content="C#"/>
-                            </ComboBox>
-                        </Border>
-                    </StackPanel>
-
-                    <!-- "Type" ComboBox -->
-                    <StackPanel Margin="10">
-                        <TextBlock Text="Select Type" Margin="0,0,0,5" TextAlignment="Center"/>
-                        <Border BorderBrush="Black" BorderThickness="1">
-                            <ComboBox Width="120" Height="22" BorderThickness="0">
-                                <ComboBoxItem Content="Class"/>
-                                <ComboBoxItem Content="Function"/>
-                            </ComboBox>
-                        </Border>
-                    </StackPanel>
+                    <!-- Next Button -->
+                    <Border BorderBrush="Black" BorderThickness="1" Width="160" Height="40">
+                        <Button Content="next" BorderThickness="0" Click="NextButton_Click"/>
+                    </Border>
 
                 </StackPanel>
-
-                <!-- Next Button -->
-                <Border BorderBrush="Black" BorderThickness="1" Width="160" Height="40">
-                    <Button Content="next" BorderThickness="0"/>
-                </Border>
-
-            </StackPanel>
-        </Grid>
+            </Grid>
+        </ContentControl>
     </Grid>
 </Window>
