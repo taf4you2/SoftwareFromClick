@@ -51,6 +51,10 @@ namespace SoftwareFromClick.Views
         private void GenerateCodeButton_Click(object sender, RoutedEventArgs e)
         {
 
+            Loading.Visibility = Visibility.Visible;
+            MessageBox.Show("Request sent to AI model. Please wait for response...", "Processing",
+              MessageBoxButton.OK,
+              MessageBoxImage.Information);
         }
 
     }

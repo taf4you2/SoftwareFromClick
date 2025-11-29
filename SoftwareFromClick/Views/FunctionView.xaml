@@ -5,8 +5,13 @@
 
     <Grid>
 
+        
+        
+        
         <!-- Right column - Function Form with ScrollViewer -->
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            
+            
             <Grid Margin="20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -26,6 +31,24 @@
                     <RowDefinition Height="*"/>
                     <!-- Ten wiersz zajmie całą pozostałą przestrzeń -->
                 </Grid.RowDefinitions>
+             
+                <Border x:Name="Loading" 
+                          Background="#CC000000" 
+                          Visibility="Collapsed"
+                          Grid.ColumnSpan="2">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="Sending request to AI model..." 
+                          Foreground="White" 
+                          FontSize="18" 
+                          FontWeight="Bold"
+                          Margin="0,0,0,20"/>
+                        <TextBlock Text="Please wait for response..." 
+                          Foreground="White" 
+                          FontSize="14"
+                          TextAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
 
                 <!-- Header -->
                 <TextBlock Grid.Row="0" Text="Define Function" FontSize="20" FontWeight="Bold"/>
@@ -121,7 +144,7 @@
                         <Button Content="Preview Prompt" Width="120" Height="35" BorderThickness="0" Click="PreviewPromptButton_Click"/>
                     </Border>
                     <Border BorderBrush="Black" BorderThickness="1">
-                        <Button Content="Generate Code" Width="120" Height="35" BorderThickness="0"/>
+                        <Button Content="Generate Code" Width="120" Height="35" BorderThickness="0" Click="GenerateCodeButton_Click"/>
                     </Border>
                 </StackPanel>
             </Grid>
