@@ -52,9 +52,15 @@ namespace SoftwareFromClick.Views
         {
 
             Loading.Visibility = Visibility.Visible;
-            MessageBox.Show("Request sent to AI model. Please wait for response...", "Processing",
+            MessageBoxResult result = MessageBox.Show("Request sent to AI model. Please wait for response...", "Processing",
               MessageBoxButton.OK,
               MessageBoxImage.Information);
+
+            if (result == MessageBoxResult.OK)
+            {
+                ResultsView resultsView = new ResultsView(_mainWindow);
+                _mainWindow.MainContentControl.Content = resultsView;
+            }
         }
 
     }

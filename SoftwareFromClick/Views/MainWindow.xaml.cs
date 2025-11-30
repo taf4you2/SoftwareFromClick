@@ -57,5 +57,12 @@ namespace SoftwareFromClick.Views
         {
             MainContentControl.Content = _welcomeScreen; // po nacisnieciu back przywrocenie stanu poczatkowego
         }
+
+        public void ShowResultView()
+        {
+            ResultsView resultView = new ResultsView(this);
+            MainContentControl.Content = resultView;
+        }
+
     }
 }

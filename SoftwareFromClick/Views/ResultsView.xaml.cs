@@ -17,11 +17,23 @@ namespace SoftwareFromClick.Views
     /// <summary>
     /// Interaction logic for ResultsView.xaml
     /// </summary>
-    public partial class ResultsView : Window
+    public partial class ResultsView : UserControl
     {
-        public ResultsView()
+        private MainWindow _mainWindow;
+
+        public ResultsView(MainWindow mainWindow)
         {
             InitializeComponent();
+            _mainWindow = mainWindow;
+        }
+        private void NewQueryButton_Click(object sender, RoutedEventArgs e)
+        {
+            _mainWindow.ShowWelcomeScreen();
+        }
+
+        private void EditQueryButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("not implemented");
         }
     }
 }
