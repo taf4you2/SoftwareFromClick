@@ -7,7 +7,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SoftwareFromClick.Models
 {
-    public class Model
+    public class AiModel
     {
         public int Id { get; set; }
         public string ModelName { get; set; } = string.Empty;

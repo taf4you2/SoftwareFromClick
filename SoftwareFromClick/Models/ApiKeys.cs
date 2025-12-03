@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SoftwareFromClick.Models
 {
-    public class ApiKey
+    public class ApiKeys
     {
         public int Id { get; set; }
 

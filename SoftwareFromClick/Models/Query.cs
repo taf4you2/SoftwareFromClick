@@ -19,7 +19,7 @@ namespace SoftwareFromClick.Models
         public User User { get; set; } = null!;
 
         public int ModelId { get; set; }
-        public Model Model { get; set; } = null!;
+        public AiModel Model { get; set; } = null!;
 
         public int LanguageId { get; set; }
         public Language Language { get; set; } = null!;
