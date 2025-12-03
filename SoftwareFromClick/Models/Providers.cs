@@ -8,5 +8,12 @@ namespace SoftwareFromClick.Models
 {
     public class Provider
     {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Url { get; set; } = string.Empty;
+
+        // Relacje
+        public ICollection<ApiKeys> ApiKeys { get; set; } = new List<ApiKeys>();
+        public ICollection<Models> Models { get; set; } = new List<Models>();
     }
 }
