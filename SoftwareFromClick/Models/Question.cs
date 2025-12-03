@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SoftwareFromClick.Models
 {
-    public class Queries
+    public class Question
     {
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;

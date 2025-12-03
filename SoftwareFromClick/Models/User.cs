@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
 
 
 namespace SoftwareFromClick.Models
@@ -24,7 +24,7 @@ namespace SoftwareFromClick.Models
         // relacje
         
         public ICollection<ApiKeys> ApiKeys { get; set; } = new List<ApiKeys>(); // Jeden użytkownik może mieć wiele kluczy API
-        public ICollection<Query> Queries { get; set; } = new List<Query>(); // Jeden użytkownik może mieć wiele zapytań
+        public ICollection<Question> Queries { get; set; } = new List<Question>(); // Jeden użytkownik może mieć wiele zapytań
         public ICollection<Session> Sessions { get; set; } = new List<Session>(); // Jeden użytkownik może mieć wiele sesji
         public ICollection<EditedResult> EditedResults { get; set; } = new List<EditedResult>(); // Jeden użytkownik może edytować wiele wyników
     }

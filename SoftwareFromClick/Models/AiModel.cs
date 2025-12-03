@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
 
 namespace SoftwareFromClick.Models
 {
@@ -19,6 +19,6 @@ namespace SoftwareFromClick.Models
         public Provider Provider { get; set; } = null!;
 
         // Relacje
-        public ICollection<Query> Queries { get; set; } = new List<Query>();
+        public ICollection<Question> Queries { get; set; } = new List<Question>();
     }
 }

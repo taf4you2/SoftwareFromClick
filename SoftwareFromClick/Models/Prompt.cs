@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
 
 namespace SoftwareFromClick.Models
 {
@@ -15,6 +15,6 @@ namespace SoftwareFromClick.Models
 
         // Klucze obce
         public int QueryId { get; set; }
-        public Query Query { get; set; } = null!;
+        public Question Query { get; set; } = null!;
     }
 }
