@@ -19,16 +19,16 @@ namespace SoftwareFromClick.Models
         public User User { get; set; } = null!;
 
         public int ModelId { get; set; }
-        public Models Model { get; set; } = null!;
+        public Model Model { get; set; } = null!;
 
         public int LanguageId { get; set; }
-        public Languages Language { get; set; } = null!;
+        public Language Language { get; set; } = null!;
 
         // Relacje
-        public ICollection<Prompts> Prompts { get; set; } = new List<Prompts>();
-        public ICollection<Results> Results { get; set; } = new List<Results>();
+        public ICollection<Prompt> Prompts { get; set; } = new List<Prompt>();
+        public ICollection<Result> Results { get; set; } = new List<Result>();
 
         // Relacja wiele-do-wielu
-        public ICollection<PromptTemplatesUsed> PromptTemplatesUsed { get; set; } = new List<PromptTemplatesUsed>();
+        public ICollection<PromptTemplateUsed> PromptTemplatesUsed { get; set; } = new List<PromptTemplateUsed>();
     }
 }

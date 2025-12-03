@@ -7,18 +7,14 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SoftwareFromClick.Models
 {
-    public class Models
+    public class Language
     {
         public int Id { get; set; }
-        public string ModelName { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public bool RequiresApiKey { get; set; }
-
-        // Klucze obce
-        public int ProviderId { get; set; }
-        public Provider Provider { get; set; } = null!;
+        public string Name { get; set; } = string.Empty;
+        public string Extension { get; set; } = string.Empty;
 
         // Relacje
         public ICollection<Query> Queries { get; set; } = new List<Query>();
+        public ICollection<PromptTemplate> PromptTemplates { get; set; } = new List<PromptTemplate>();
     }
 }

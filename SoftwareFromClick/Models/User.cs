@@ -23,9 +23,9 @@ namespace SoftwareFromClick.Models
 
         // relacje
         
-        public ICollection<ApiKeys> ApiKeys { get; set; } = new List<ApiKeys>(); // Jeden użytkownik może mieć wiele kluczy API
+        public ICollection<ApiKey> ApiKeys { get; set; } = new List<ApiKey>(); // Jeden użytkownik może mieć wiele kluczy API
         public ICollection<Query> Queries { get; set; } = new List<Query>(); // Jeden użytkownik może mieć wiele zapytań
-        public ICollection<Sessions> Sessions { get; set; } = new List<Sessions>(); // Jeden użytkownik może mieć wiele sesji
-        public ICollection<EditedResults> EditedResults { get; set; } = new List<EditedResults>(); // Jeden użytkownik może edytować wiele wyników
+        public ICollection<Session> Sessions { get; set; } = new List<Session>(); // Jeden użytkownik może mieć wiele sesji
+        public ICollection<EditedResult> EditedResults { get; set; } = new List<EditedResult>(); // Jeden użytkownik może edytować wiele wyników
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SoftwareFromClick.Models
 {
-    public class PromptTemplates
+    public class PromptTemplate
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -18,12 +18,12 @@ namespace SoftwareFromClick.Models
 
         // Klucze obce
         public int LanguageId { get; set; }
-        public Languages Language { get; set; } = null!;
+        public Language Language { get; set; } = null!;
 
         public int? CategoryId { get; set; }
         public TemplateCategories? Category { get; set; }
 
         // Relacja wiele-do-wielu
-        public ICollection<PromptTemplatesUsed> PromptTemplatesUsed { get; set; } = new List<PromptTemplatesUsed>();
+        public ICollection<PromptTemplateUsed> PromptTemplatesUsed { get; set; } = new List<PromptTemplateUsed>();
     }
 }

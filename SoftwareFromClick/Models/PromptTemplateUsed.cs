@@ -7,7 +7,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SoftwareFromClick.Models
 {
-    public class PromptTemplatesUsed
+    public class PromptTemplateUsed
     {
         public int Id { get; set; }
         
@@ -15,6 +15,6 @@ namespace SoftwareFromClick.Models
         public Query Query { get; set; } = null!;
 
         public int PromptTemplateId { get; set; }
-        public PromptTemplates PromptTemplate { get; set; } = null!;
+        public PromptTemplate PromptTemplate { get; set; } = null!;
     }
 }

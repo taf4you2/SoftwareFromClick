@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace SoftwareFromClick.Models
 {
-    public class EditedResults
+    public class EditedResult
     {
         public int Id { get; set; }
 
         // Klucze obce
         public int ResultId { get; set; }
-        public Results Result { get; set; } = null!;
+        public Result Result { get; set; } = null!;
 
         public string EditedCode { get; set; } = string.Empty;
 

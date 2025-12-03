@@ -12,6 +12,6 @@ namespace SoftwareFromClick.Models
         public string Name { get; set; } = string.Empty;
 
         // Relacje
-        public ICollection<PromptTemplates> PromptTemplates { get; set; } = new List<PromptTemplates>();
+        public ICollection<PromptTemplate> PromptTemplates { get; set; } = new List<PromptTemplate>();
     }
 }

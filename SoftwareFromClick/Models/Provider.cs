@@ -13,7 +13,7 @@ namespace SoftwareFromClick.Models
         public string Url { get; set; } = string.Empty;
 
         // Relacje
-        public ICollection<ApiKeys> ApiKeys { get; set; } = new List<ApiKeys>();
-        public ICollection<Models> Models { get; set; } = new List<Models>();
+        public ICollection<ApiKey> ApiKeys { get; set; } = new List<ApiKey>();
+        public ICollection<Model> Models { get; set; } = new List<Model>();
     }
 }
