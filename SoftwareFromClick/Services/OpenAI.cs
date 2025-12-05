@@ -1,8 +1,8 @@
 ﻿using System;
-using System.IO;                // Do operacji na plikach
+using System.IO;
 using System.Net.Http;
-using System.Net.Http.Json;     // Z paczki którą zainstalowałeś
-using System.Text.Json;         // Do czytania konfiguracji
+using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Collections.Generic;

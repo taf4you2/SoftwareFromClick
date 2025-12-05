@@ -70,7 +70,7 @@ namespace SoftwareFromClick.Views
             string generatedCode = await service.GetCodeFromAiAsync(functionalityDescription);
 
             // 4. Ukrywamy Loading
-            Loading.Visibility = Visibility.Collapsed;
+            //Loading.Visibility = Visibility.Collapsed;
 
             // 5. Przechodzimy do widoku wyników, przekazując kod
             ResultsView resultsView = new ResultsView(_mainWindow, generatedCode);
