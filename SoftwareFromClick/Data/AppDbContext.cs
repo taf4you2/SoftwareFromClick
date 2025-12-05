@@ -30,6 +30,8 @@ namespace SoftwareFromClick.Data
         {
            // szukamy ścieżki do folderu gdzie przechowywane są wszystkie bazy i towrzymy ją tam
            // ale ciężary
+           //update z trasy probuję podejrzeć co się dzieje w tej bazie i jak to wygląda ale dbeaver coś pali kompa
+           //pomocy
 
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);

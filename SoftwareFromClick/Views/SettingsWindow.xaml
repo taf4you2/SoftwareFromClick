@@ -24,7 +24,7 @@
             <StackPanel Grid.Column="0" Margin="0,0,10,0">
                 <TextBlock Text="Provider:" Margin="0,0,0,5"/>
                 <Border BorderBrush="Black" BorderThickness="1">
-                    <ComboBox Height="22" BorderThickness="0">
+                    <ComboBox x:Name="ProviderComboBox" Height="22" BorderThickness="0">
                         <ComboBoxItem Content="OpenAI (GPT)"/>
                     </ComboBox>
                 </Border>
@@ -33,27 +33,28 @@
             <StackPanel Grid.Column="1" Margin="0,0,10,0">
                 <TextBlock Text="API Key:" Margin="0,0,0,5"/>
                 <Border BorderBrush="Black" BorderThickness="1">
-                    <TextBox Height="22" BorderThickness="0"/>
+                    <TextBox x:Name="KeyTextBox" Height="22" BorderThickness="0"/>
                 </Border>
             </StackPanel>
 
             <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1" VerticalAlignment="Bottom">
-                <Button Content="Add" Width="80" Height="22" BorderThickness="0"/>
+                <Button Content="Add" Width="80" Height="22" BorderThickness="0" Click="AddButton_Click"/>
             </Border>
         </Grid>
 
         <!-- API Keys List -->
         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="20,0,20,20">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" BorderThickness="0">
+                <DataGrid x:Name="KeysDataGrid" AutoGenerateColumns="False" CanUserAddRows="False" BorderThickness="0">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Provider" Width="150"/>
-                        <DataGridTextColumn Header="API Key" Width="*"/>
-                        <DataGridTextColumn Header="Status" Width="100"/>
+                        <DataGridTextColumn Header="Provider" Binding="{Binding Provider.Name}" Width="150"/>
+                        <DataGridTextColumn Header="API Key" Binding="{Binding ApiKey}" Width="*"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding IsActive}" Width="100"/>
+
                         <DataGridTemplateColumn Header="Actions" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="Delete" Width="70"/>
+                                    <Button Content="Delete" Width="70" Click="DeleteButton_Click" Tag="{Binding Id}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -62,13 +63,16 @@
             </ScrollViewer>
         </Border>
 
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20">
+            <Border BorderBrush="Black" BorderThickness="1">
+                <Button Content="Close" Width="80" Height="30" BorderThickness="0" Click="CloseButton_Click"/>
+            </Border>
+        </StackPanel>
+
         <!-- Bottom buttons -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20">
             <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,10,0">
-                <Button Content="Cancel" Width="80" Height="30" BorderThickness="0" Click="CancelButton_Click"/>
-            </Border>
-            <Border BorderBrush="Black" BorderThickness="1">
-                <Button Content="Save" Width="80" Height="30" BorderThickness="0" Click="SaveButton_Click"/>
+                <Button Content="Cancel" Width="80" Height="30" BorderThickness="0" Click="CloseButton_Click"/>
             </Border>
         </StackPanel>
     </Grid>
