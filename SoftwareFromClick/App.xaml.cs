@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace SoftwareFromClick
 {
         /// <summary>
-        /// Interaction logic for App.xaml
+        /// Interaction logic for App.xaml e
         /// </summary>
     public partial class App : Application
     {
