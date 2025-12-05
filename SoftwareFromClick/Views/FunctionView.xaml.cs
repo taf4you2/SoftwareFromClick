@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SoftwareFromClick.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,19 +49,32 @@ namespace SoftwareFromClick.Views
             }
         }
 
-        private void GenerateCodeButton_Click(object sender, RoutedEventArgs e)
+        private async void GenerateCodeButton_Click(object sender, RoutedEventArgs e)
         {
+            // 1. Pobieramy tekst z pola, które nazwaliśmy
+            string functionalityDescription = FunctionalitiesTextBox.Text;
 
-            Loading.Visibility = Visibility.Visible;
-            MessageBoxResult result = MessageBox.Show("Request sent to AI model. Please wait for response...", "Processing",
-              MessageBoxButton.OK,
-              MessageBoxImage.Information);
-
-            if (result == MessageBoxResult.OK)
+            if (string.IsNullOrWhiteSpace(functionalityDescription))
             {
-                ResultsView resultsView = new ResultsView(_mainWindow);
-                _mainWindow.MainContentControl.Content = resultsView;
+                MessageBox.Show("Please describe functionalities first.");
+                return;
             }
+
+            // 2. Pokazujemy Loading
+            Loading.Visibility = Visibility.Visible;
+
+            // 3. Wywołujemy serwis
+            OpenAiService service = new OpenAiService();
+
+            // Tutaj aplikacja poczeka na odpowiedź z sieci, ale nie zawiesi interfejsu
+            string generatedCode = await service.GetCodeFromAiAsync(functionalityDescription);
+
+            // 4. Ukrywamy Loading
+            Loading.Visibility = Visibility.Collapsed;
+
+            // 5. Przechodzimy do widoku wyników, przekazując kod
+            ResultsView resultsView = new ResultsView(_mainWindow, generatedCode);
+            _mainWindow.MainContentControl.Content = resultsView;
         }
 
     }

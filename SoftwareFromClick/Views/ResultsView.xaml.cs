@@ -21,10 +21,14 @@ namespace SoftwareFromClick.Views
     {
         private MainWindow _mainWindow;
 
-        public ResultsView(MainWindow mainWindow)
+        public ResultsView(MainWindow mainWindow, string generatedCode)
         {
             InitializeComponent();
             _mainWindow = mainWindow;
+
+
+            // Wpisujemy kod do pola tekstowego
+            CodeTextBox.Text = generatedCode;
         }
         private void NewQueryButton_Click(object sender, RoutedEventArgs e)
         {

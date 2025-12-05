@@ -60,7 +60,7 @@ namespace SoftwareFromClick.Views
 
         public void ShowResultView()
         {
-            ResultsView resultView = new ResultsView(this);
+            ResultsView resultView = new ResultsView(this, string.Empty); // trzeba tak zrobić żeby ekrany między sobą przekazywały tego prompta
             MainContentControl.Content = resultView;
         }
 
