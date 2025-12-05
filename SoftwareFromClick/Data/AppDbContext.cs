@@ -28,8 +28,24 @@ namespace SoftwareFromClick.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Nazwa pliku bazy danych to "softwarefromclick.db"
-            optionsBuilder.UseSqlite("Data Source=softwarefromclick.db");
+           // szukamy ścieżki do folderu gdzie przechowywane są wszystkie bazy i towrzymy ją tam
+           // ale ciężary
+           //update z trasy probuję podejrzeć co się dzieje w tej bazie i jak to wygląda ale dbeaver coś pali kompa
+           //pomocy
+
+            var folder = Environment.SpecialFolder.LocalApplicationData;
+            var path = Environment.GetFolderPath(folder);
+
+            var dbPath = System.IO.Path.Join(path, "SoftwareFromClick");
+
+            if (!System.IO.Directory.Exists(dbPath))
+            {
+                System.IO.Directory.CreateDirectory(dbPath);
+            }
+
+            var dbFile = System.IO.Path.Join(dbPath, "softwarefromclick.db");
+
+            optionsBuilder.UseSqlite($"Data Source={dbFile}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

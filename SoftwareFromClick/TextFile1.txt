@@ -1,0 +1,2 @@
+﻿SettingsWindow
+	jak wyświetlać i co wyświetlać i jaki jest cel tego wyświetlania ()
