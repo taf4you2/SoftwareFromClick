@@ -28,8 +28,22 @@ namespace SoftwareFromClick.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Nazwa pliku bazy danych to "softwarefromclick.db"
-            optionsBuilder.UseSqlite("Data Source=softwarefromclick.db");
+           // szukamy ścieżki do folderu gdzie przechowywane są wszystkie bazy i towrzymy ją tam
+           // ale ciężary
+
+            var folder = Environment.SpecialFolder.LocalApplicationData;
+            var path = Environment.GetFolderPath(folder);
+
+            var dbPath = System.IO.Path.Join(path, "SoftwareFromClick");
+
+            if (!System.IO.Directory.Exists(dbPath))
+            {
+                System.IO.Directory.CreateDirectory(dbPath);
+            }
+
+            var dbFile = System.IO.Path.Join(dbPath, "softwarefromclick.db");
+
+            optionsBuilder.UseSqlite($"Data Source={dbFile}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
