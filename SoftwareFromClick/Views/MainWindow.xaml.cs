@@ -9,6 +9,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using SoftwareFromClick.Models;
+using SoftwareFromClick.Services;
+
 namespace SoftwareFromClick.Views
 {
     /// <summary>
@@ -18,11 +21,19 @@ namespace SoftwareFromClick.Views
     public partial class MainWindow : Window
     {
         private UIElement _welcomeScreen; // 'snap' ekranu poczatkowego
+        private readonly MainService _mainService; // Referencja do serwisu
+
 
         public MainWindow()
         {
             InitializeComponent();
             _welcomeScreen = MainContentControl.Content as UIElement; // zapis ekranu powitalnego (zeby sie dalo wrocic)
+
+            // Inicjalizacja serwisu
+            _mainService = new MainService();
+
+            // Ładowanie danych do list rozwijanych
+            LoadComboBoxData();
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -36,23 +47,50 @@ namespace SoftwareFromClick.Views
 
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
-            ComboBoxItem selectedType = TypeComboBox.SelectedItem as ComboBoxItem;
+            ComboBoxItem selectedTypeItem = TypeComboBox.SelectedItem as ComboBoxItem;
+            string selectedType = selectedTypeItem?.Content.ToString();
 
-            if (selectedType != null)
+            var selectedModel = ModelComboBox.SelectedItem as AiModel;
+            var selectedLanguage = LanguageComboBox.SelectedItem as Language;
+
+            if (selectedType != null && selectedModel != null && selectedLanguage != null)
             {
-                if (selectedType.Content.ToString() == "Function")
+                if (selectedType == "Function")
                 {
+                    // tu przerzucamy ustawienia poczatkowe do functionview
                     FunctionView functionView = new FunctionView(this);
                     MainContentControl.Content = functionView;
                 }
-                else if (selectedType.Content.ToString() == "Class")
+                else if (selectedType == "Class")
                 {
                     MessageBox.Show("ClassView not implemented yet");
                 }
             }
             else
             {
-                MessageBox.Show("Please select all options");
+                MessageBox.Show("Please select all options (Model, Language, Type)");
+            }
+        }
+
+        private void LoadComboBoxData()
+        {
+            try
+            {
+                // 1. Pobierz dane z serwisu
+                var languages = _mainService.GetLanguages();
+                var models = _mainService.GetAiModels();
+
+                // 2. Przypisz do ComboBoxów
+                LanguageComboBox.ItemsSource = languages;
+                ModelComboBox.ItemsSource = models;
+
+                // 3. Opcjonalnie: Zaznacz pierwsze elementy domyślnie
+                if (LanguageComboBox.Items.Count > 0) LanguageComboBox.SelectedIndex = 0;
+                if (ModelComboBox.Items.Count > 0) ModelComboBox.SelectedIndex = 0;
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show("Błąd ładowania danych z bazy: " + ex.Message);
             }
         }
 
