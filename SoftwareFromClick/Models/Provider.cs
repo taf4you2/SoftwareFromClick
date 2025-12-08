@@ -15,5 +15,7 @@ namespace SoftwareFromClick.Models
         // Relacje
         public ICollection<ApiKeys> ApiKeys { get; set; } = new List<ApiKeys>();
         public ICollection<AiModel> Models { get; set; } = new List<AiModel>();
+
+        public ICollection<ProviderTemplate> ProviderTemplates { get; set; } = new List<ProviderTemplate>();
     }
 }

@@ -16,5 +16,8 @@ namespace SoftwareFromClick.Models
 
         public int PromptTemplateId { get; set; }
         public PromptTemplate PromptTemplate { get; set; } = null!;
+
+        public int ProviderTemplateId { get; set; }
+        public ProviderTemplate ProviderTemplate { get; set; } = null!;
     }
 }

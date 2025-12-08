@@ -89,7 +89,7 @@ namespace SoftwareFromClick.Data
                 provider = new Provider
                 {
                     Name = name,
-                    Url = "https://api.openai.com"
+                    Url = "https://api.openai.com/v1/chat/completions"
                 };
                 context.Providers.Add(provider);
                 context.SaveChanges();

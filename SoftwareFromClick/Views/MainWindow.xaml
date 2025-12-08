@@ -1,7 +1,7 @@
 ﻿<Window x:Class="SoftwareFromClick.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="SoftwareFromClick" Height="600" Width="900">
+        Title="SoftwareFromClick" Height="700" Width="900">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="140"/>

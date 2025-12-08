@@ -25,6 +25,7 @@ namespace SoftwareFromClick.Data
         public DbSet<TemplateCategories> TemplateCategories { get; set; }
         public DbSet<PromptTemplate> PromptTemplates { get; set; }
         public DbSet<PromptTemplateUsed> PromptTemplatesUsed { get; set; }
+        public DbSet<ProviderTemplate> ProviderTemplates { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -150,6 +151,12 @@ namespace SoftwareFromClick.Data
                 .WithMany(c => c.PromptTemplates)
                 .HasForeignKey(pt => pt.CategoryId)
                 .OnDelete(DeleteBehavior.SetNull); // Kategoria jest opcjonalna (int?)
+            // Provider -> ProviderTemplates (Jeden dostawca, wiele szablonów dostawcy)
+            modelBuilder.Entity<ProviderTemplate>()
+                .HasOne(pt => pt.Provider)
+                .WithMany(p => p.ProviderTemplates)
+                .HasForeignKey(pt => pt.ProviderId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // --- Tabela łącząca (PromptTemplateUsed) ---
             // Relacja wiele-do-wielu rozbita na dwie relacje jeden-do-wielu
@@ -167,6 +174,12 @@ namespace SoftwareFromClick.Data
                 .WithMany(pt => pt.PromptTemplatesUsed)
                 .HasForeignKey(ptu => ptu.PromptTemplateId)
                 .OnDelete(DeleteBehavior.Cascade);
+            // ProviderTemplate -> PromptTemplatesUsed (Jeden szablon dostawcy, wiele użyć)
+            modelBuilder.Entity<PromptTemplateUsed>()
+                .HasOne(ptu => ptu.ProviderTemplate)
+                .WithMany(pt => pt.PromptTemplatesUsed)
+                .HasForeignKey(ptu => ptu.ProviderTemplateId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

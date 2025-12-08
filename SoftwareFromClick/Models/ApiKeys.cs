@@ -18,10 +18,11 @@ namespace SoftwareFromClick.Models
 
         // Klucze obce
         public int UserId { get; set; }
-        public User User { get; set; } = null!;
+
+        public int ProviderId { get; set; }
 
         // Relacje
-        public int ProviderId { get; set; }
+        public User User { get; set; } = null!;
         public Provider Provider { get; set; } = null!;
     }
 }
