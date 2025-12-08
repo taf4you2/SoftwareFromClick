@@ -1,0 +1,1 @@
+﻿tutaj trzeba będzie dodać docelowo service do inicializacje tych templatów w jakiś sposób
