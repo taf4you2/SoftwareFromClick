@@ -4,10 +4,6 @@
 
 
     <Grid>
-
-        
-        
-        
         <!-- Right column - Function Form with ScrollViewer -->
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
             
@@ -57,7 +53,7 @@
                 <StackPanel Grid.Row="2">
                     <TextBlock Text="Function Name:" Margin="0,0,0,5"/>
                     <Border BorderBrush="Black" BorderThickness="1">
-                        <TextBox Height="30" BorderThickness="0" ToolTip="Enter function name, e.g. CalculateSum"/>
+                        <TextBox x:Name="FunctionNameTextBox" Height="30" BorderThickness="0" ToolTip="Enter function name, e.g. CalculateSum"/>
                     </Border>
                 </StackPanel>
 
@@ -65,7 +61,7 @@
                 <StackPanel Grid.Row="4">
                     <TextBlock Text="Function Type:" Margin="0,0,0,5"/>
                     <Border BorderBrush="Black" BorderThickness="1">
-                        <ComboBox Height="30" BorderThickness="0" ToolTip="Select access modifier and type">
+                        <ComboBox x:Name="FunctionTypeComboBox" Height="30" BorderThickness="0" ToolTip="Select access modifier and type">
                             <ComboBoxItem Content="public"/>
                             <ComboBoxItem Content="private"/>
                             <ComboBoxItem Content="protected"/>
@@ -78,7 +74,7 @@
                 <!-- Functionalities -->
                 <StackPanel Grid.Row="6">
                     <TextBlock Text="Functionalities:" Margin="0,0,0,5"/>
-                    <Border BorderBrush="Black" BorderThickness="1">
+                    <Border  BorderBrush="Black" BorderThickness="1">
                         <TextBox x:Name="FunctionalitiesTextBox"
                                  Height="100" 
                                  AcceptsReturn="True" 
@@ -93,7 +89,8 @@
                 <StackPanel Grid.Row="8">
                     <TextBlock Text="Input Parameters:" Margin="0,0,0,5"/>
                     <Border BorderBrush="Black" BorderThickness="1">
-                        <TextBox Height="80" 
+                        <TextBox x:Name="InputParametersTextBox"
+                                 Height="80" 
                                  AcceptsReturn="True" 
                                  TextWrapping="Wrap" 
                                  VerticalScrollBarVisibility="Auto"
@@ -106,7 +103,10 @@
                 <StackPanel Grid.Row="10">
                     <TextBlock Text="Return Type:" Margin="0,0,0,5"/>
                     <Border BorderBrush="Black" BorderThickness="1">
-                        <TextBox Height="30" BorderThickness="0" ToolTip="e.g. void, int, string, bool"/>
+                        <TextBox    x:Name="ReturnTypeTextBox"
+                                    Height="30"
+                                    BorderThickness="0"
+                                    ToolTip="e.g. void, int, string, bool"/>
                     </Border>
                 </StackPanel>
 
