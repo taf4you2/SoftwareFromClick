@@ -1,0 +1,14 @@
+﻿{
+	"model": "{{SelectedModel}}",
+	"messages": [
+		{
+			"role": "system",
+			"content": "{{SystemPrompt}}"
+		},
+		{
+			"role": "user",
+			"content": "{{UserPrompt}}"
+		}
+	],
+	"temperature": 0.2
+}

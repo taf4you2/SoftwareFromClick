@@ -30,9 +30,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Templates\ProviderTemplates\" />
-    <Folder Include="Templates\PromptTemplates\" />
-  </ItemGroup>
-
 </Project>
