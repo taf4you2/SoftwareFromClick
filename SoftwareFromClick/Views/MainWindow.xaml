@@ -20,10 +20,10 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <TextBlock Text="history" Margin="5" FontWeight="Bold"/>
-                        <ListView BorderThickness="0">
-                            <ListViewItem Content="query"/>
-                            <ListViewItem Content="query"/>
-                            <ListViewItem Content="query"/>
+                        <ListView x:Name="HistoryListView" 
+                                  BorderThickness="0" 
+                                  SelectionChanged="HistoryListView_SelectionChanged"
+                                  DisplayMemberPath="Title">
                         </ListView>
                     </StackPanel>
                 </ScrollViewer>

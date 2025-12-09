@@ -34,6 +34,7 @@ namespace SoftwareFromClick.Views
 
             // Ładowanie danych do list rozwijanych
             LoadComboBoxData();
+            LoadHistory();
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -103,6 +104,48 @@ namespace SoftwareFromClick.Views
         {
             ResultsView resultView = new ResultsView(this, string.Empty); // trzeba tak zrobić żeby ekrany między sobą przekazywały tego prompta
             MainContentControl.Content = resultView;
+        }
+
+        public void LoadHistory()
+        {
+            try
+            {
+                var history = _mainService.GetHistory();
+                HistoryListView.ItemsSource = history;
+            }
+            catch (System.Exception ex)
+            {
+                // Ciche łapanie błędu przy starcie, żeby nie straszyć usera pustą bazą
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void HistoryListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (HistoryListView.SelectedItem is Question selectedQuestion)
+            {
+                // Sprawdzamy, czy to zapytanie ma jakieś wyniki
+                var lastResult = selectedQuestion.Results
+                    .OrderByDescending(r => r.CreatedAt)
+                    .FirstOrDefault();
+
+                if (lastResult != null && !string.IsNullOrEmpty(lastResult.JsonFilePath))
+                {
+                    // Pobieramy treść kodu z pliku JSON
+                    string code = _mainService.GetCodeFromResult(lastResult.JsonFilePath);
+
+                    // Wyświetlamy ResultsView z historycznym kodem
+                    ResultsView resultsView = new ResultsView(this, code);
+                    MainContentControl.Content = resultsView;
+                }
+                else
+                {
+                    MessageBox.Show("No results found for this query.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                // Opcjonalnie: Resetujemy zaznaczenie, żeby można było kliknąć to samo jeszcze raz
+                HistoryListView.SelectedItem = null;
+            }
         }
 
     }

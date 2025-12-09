@@ -54,7 +54,7 @@ namespace SoftwareFromClick.Views
 
         private async void GenerateCodeButton_Click(object sender, RoutedEventArgs e)
         {
-            // ZBIERANIE DANYCH Z FORMULARZA
+            // 1. ZBIERANIE DANYCH Z FORMULARZA (To pozostaje bez zmian)
             string funcName = FunctionNameTextBox.Text.Trim();
             string funcDesc = FunctionalitiesTextBox.Text.Trim();
             string inputParams = InputParametersTextBox.Text.Trim();
@@ -65,11 +65,10 @@ namespace SoftwareFromClick.Views
             string funcType = selectedTypeItem?.Content.ToString() ?? "public";
 
             // POBRANIE KONTEKSTU Z GŁÓWNEGO OKNA
-            // Używamy referencji do MainWindow, aby dostać się do wybranych opcji
             var selectedModel = _mainWindow.ModelComboBox.SelectedItem as AiModel;
             var selectedLanguage = _mainWindow.LanguageComboBox.SelectedItem as Language;
 
-            // WALIDACJA
+            // 2. WALIDACJA (Bez zmian)
             if (string.IsNullOrWhiteSpace(funcName) || string.IsNullOrWhiteSpace(funcDesc))
             {
                 MessageBox.Show("Function Name and Functionalities are required!", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -82,7 +81,7 @@ namespace SoftwareFromClick.Views
                 return;
             }
 
-            // PAKOWANIE DANYCH (PRZYGOTOWANIE DO WYSŁANIA)
+            // 3. PAKOWANIE DANYCH (Obiekt DTO jest już gotowy w Twoim projekcie)
             var requestData = new FunctionRequestDto
             {
                 FunctionName = funcName,
@@ -94,28 +93,41 @@ namespace SoftwareFromClick.Views
                 SelectedLanguage = selectedLanguage
             };
 
-            // WYSŁANIE DO SERWISU
+            // 4. WYSŁANIE DO SERWISU (TUTAJ ZMIANA)
             Loading.Visibility = Visibility.Visible;
 
             try
             {
-                // NA RAZIE TYLKO TESTOWO
                 OpenAiService service = new OpenAiService();
 
-                // Tymczasowo stare wywołanie (nie używa jeszcze wszystkich pól):
-                string generatedCode = await service.GetCodeFromAiAsync(
-                    requestData.FunctionName,
-                    requestData.ReturnType,
-                    requestData.InputParameters,
-                    requestData.Functionalities
-                );
+                // Używamy nowej metody ProcessFunctionRequestAsync, która:
+                // - Zapisuje Question w bazie
+                // - Pobiera PromptTemplate i wypełnia go
+                // - Zapisuje historię do pliku JSON
+                // - Wysyła request do AI
+                // - Zapisuje Result w bazie
+                string result = await service.ProcessFunctionRequestAsync(requestData);
 
-                ResultsView resultsView = new ResultsView(_mainWindow, generatedCode);
-                _mainWindow.MainContentControl.Content = resultsView;
+                // Sprawdzenie czy serwis zwrócił błąd (Twoja metoda zwraca string z błędem lub kodem)
+                if (result.StartsWith("Error") || result.StartsWith("Connection Error"))
+                {
+                    MessageBox.Show(result, "Generation Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                else
+                {
+                    // Sukces - przekazujemy wygenerowany kod do widoku wyników
+                    ResultsView resultsView = new ResultsView(_mainWindow, result);
+                    _mainWindow.MainContentControl.Content = resultsView;
+
+                    // NOWE: Odśwież historię w głównym oknie!
+                    _mainWindow.LoadHistory();
+
+                    _mainWindow.MainContentControl.Content = resultsView;
+                }
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}");
+                MessageBox.Show($"Critical Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

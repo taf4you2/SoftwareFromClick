@@ -6,6 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.IO;
+
 namespace SoftwareFromClick.Services
 {
     public class MainService
@@ -26,6 +30,39 @@ namespace SoftwareFromClick.Services
             {
                 // Include(m => m.Provider) przydałoby się
                 return context.AiModels.OrderBy(m => m.ModelName).ToList();
+            }
+        }
+
+        public List<Question> GetHistory()
+        {
+            using (var context = new AppDbContext())
+            {
+                // Pobieramy pytania wraz z wynikami, sortujemy od najnowszych
+                return context.Queries
+                    .Include(q => q.Results)
+                    .OrderByDescending(q => q.CreatedAt)
+                    .ToList();
+            }
+        }
+
+        // Metoda pomocnicza do wyciągania kodu z zapisanego pliku JSON
+        public string GetCodeFromResult(string jsonFilePath)
+        {
+            try
+            {
+                if (!File.Exists(jsonFilePath)) return "Error: File not found.";
+
+                string jsonContent = File.ReadAllText(jsonFilePath);
+
+                // Deserializujemy strukturę odpowiedzi OpenAI (korzystamy z klas z OpenAiService)
+                // Uwaga: Upewnij się, że klasy OpenAiResponse są publiczne i dostępne
+                var response = JsonSerializer.Deserialize<OpenAiResponse>(jsonContent);
+
+                return response?.Choices?[0]?.Message?.Content ?? "No code found in history file.";
+            }
+            catch (System.Exception ex)
+            {
+                return $"Error reading history: {ex.Message}";
             }
         }
 
