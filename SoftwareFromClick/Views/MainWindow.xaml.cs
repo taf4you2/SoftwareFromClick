@@ -64,7 +64,8 @@ namespace SoftwareFromClick.Views
                 }
                 else if (selectedType == "Class")
                 {
-                    MessageBox.Show("ClassView not implemented yet");
+                    ClassView classView = new ClassView(this);
+                    MainContentControl.Content = classView;
                 }
             }
             else
