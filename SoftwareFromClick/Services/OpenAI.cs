@@ -13,45 +13,6 @@ using System.Threading.Tasks;
 
 namespace SoftwareFromClick.Services
 {
-    // Obiekt transferu danych (DTO) służący do przechowywania struktury szablonu promptu z pliku JSON.
-    public class GeneratorTemplateDto
-    {
-        public string System { get; set; }
-        public string User { get; set; }
-    }
-
-    // DTO reprezentujące strukturę żądania wysyłanego do API
-    public class OpenAiRequestDto
-    {
-        [JsonPropertyName("model")]
-        public string Model { get; set; } = "gpt-4o-mini";
-
-        [JsonPropertyName("messages")]
-        public List<MessageDto> Messages { get; set; } = new();
-
-        [JsonPropertyName("temperature")]
-        public double Temperature { get; set; } = 0.2;
-
-        [JsonPropertyName("max_tokens")]
-        public int? MaxTokens { get; set; }
-    }
-
-    // Klasa wiadomość w konwersacji z AI (rola + treść).
-    public class MessageDto
-    {
-        [JsonPropertyName("role")]
-        public string Role { get; set; }
-
-        [JsonPropertyName("content")]
-        public string Content { get; set; }
-    }
-
-    // Klasa konfiguracyjna używana do odczytu prostych ustawień z plików JSON (klucza API w starszych wersjach).
-    public class AppConfig
-    {
-        public string Key { get; set; }
-    }
-
     // Główny serwis odpowiedzialny za komunikację z modelami sztucznej inteligencji.
     // Zarządza procesem przygotowania promptu, wysyłki żądania oraz zapisu historii.
     public class OpenAiService
@@ -292,27 +253,4 @@ namespace SoftwareFromClick.Services
         }
     }
 
-    // Reprezentuje główny obiekt odpowiedzi z API (OpenAI).
-    public class OpenAiResponse
-    {
-        [JsonPropertyName("choices")]
-        public List<Choice> Choices { get; set; }
-    }
-
-    // Reprezentuje pojedynczy wybór/wariant odpowiedzi zwrócony przez model.
-    public class Choice
-    {
-        [JsonPropertyName("message")]
-        public Message Message { get; set; }
-    }
-
-    // Treść wiadomości zwrotnej.
-    public class Message
-    {
-        [JsonPropertyName("content")]
-        public string Content { get; set; }
-
-        [JsonPropertyName("role")]
-        public string Role { get; set; }
-    }
 }

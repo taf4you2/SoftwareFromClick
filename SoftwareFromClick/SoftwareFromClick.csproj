@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Models\Provider.cs" />
+    <None Include="Models\Entities\Provider.cs" />
   </ItemGroup>
 
   <ItemGroup>
