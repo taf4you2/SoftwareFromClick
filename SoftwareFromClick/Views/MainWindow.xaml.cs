@@ -37,6 +37,12 @@ namespace SoftwareFromClick.Views
             LoadHistory();
         }
 
+        private void TemplatesButton_Click(object sender, RoutedEventArgs e)
+        {
+            TemplateManagerView templateView = new TemplateManagerView(this);
+            MainContentControl.Content = templateView;
+        }
+
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             SettingsWindow settingsWindow = new SettingsWindow();

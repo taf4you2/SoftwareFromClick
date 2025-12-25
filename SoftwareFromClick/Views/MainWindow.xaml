@@ -29,10 +29,19 @@
                 </ScrollViewer>
             </Border>
 
-            <!-- Settings Button -->
-            <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="5">
-                <Button Content="settings" Height="30" Margin="5" Click="SettingsButton_Click"/>
-            </Border>
+            
+            <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
+                
+                <!-- Prompt Template Button -->
+                <Border BorderBrush="Black" BorderThickness="1" Margin="5,0,5,5">
+                    <Button Content="Templates" Height="30" Margin="5" Click="TemplatesButton_Click"/>
+                </Border>       
+
+                <!-- Settings Button -->
+                <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="5">
+                    <Button Content="Settings" Height="30" Margin="5" Click="SettingsButton_Click"/>
+                </Border>
+            </StackPanel>
         </Grid>
 
         <!-- Right column - ContentControl for switching views -->
