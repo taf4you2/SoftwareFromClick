@@ -45,11 +45,8 @@ namespace SoftwareFromClick.Views
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            SettingsWindow settingsWindow = new SettingsWindow();
-            settingsWindow.Show();
-
-            //settingsWindow.ShowDialog(); // okno dialogowe trzeba zamknąć żeby zrobić cokolwiek w głównym oknie
-            // żeby okno dialogowe działało w przyciskach trzeba zrobić zwort true albo false albo jaki kolwiek (chyba)
+            SettingsView settingsView = new SettingsView(this);
+            MainContentControl.Content = settingsView;
         }
 
         private void NextButton_Click(object sender, RoutedEventArgs e)
