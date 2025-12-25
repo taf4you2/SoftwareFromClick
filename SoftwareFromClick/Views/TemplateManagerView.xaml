@@ -32,16 +32,16 @@
 
                 <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
                     <DataGrid x:Name="TemplatesDataGrid" 
-                              AutoGenerateColumns="False" 
-                              CanUserAddRows="False" 
-                              BorderThickness="0"
-                              IsReadOnly="True" SelectionChanged="TemplatesDataGrid_SelectionChanged">
+                                AutoGenerateColumns="False" 
+                                CanUserAddRows="False" 
+                                BorderThickness="0"
+                                IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                             <DataGridTextColumn Header="Type" Binding="{Binding TemplateType}" Width="*"/>
                             <DataGridTextColumn Header="Lang" Binding="{Binding Language.Name}" Width="*"/>
 
-                            <DataGridTemplateColumn Header="Actions" Width="80">
+                            <DataGridTemplateColumn Header="Actions" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Content="Delete" Width="70" Click="DeleteTemplateButton_Click" Tag="{Binding Id}"/>
