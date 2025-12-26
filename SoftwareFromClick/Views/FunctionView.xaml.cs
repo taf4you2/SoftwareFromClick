@@ -54,78 +54,69 @@ namespace SoftwareFromClick.Views
 
         private async void GenerateCodeButton_Click(object sender, RoutedEventArgs e)
         {
-            // 1. ZBIERANIE DANYCH Z FORMULARZA (To pozostaje bez zmian)
+            // Pobranie kontekstu
+            var selectedModel = _mainWindow.ModelComboBox.SelectedItem as AiModel;
+            var selectedLanguage = _mainWindow.LanguageComboBox.SelectedItem as Language;
+
+            // Pobranie danych z formularza
             string funcName = FunctionNameTextBox.Text.Trim();
             string funcDesc = FunctionalitiesTextBox.Text.Trim();
             string inputParams = InputParametersTextBox.Text.Trim();
             string returnType = ReturnTypeTextBox.Text.Trim();
 
-            // Pobranie wartości z ComboBoxa
             var selectedTypeItem = FunctionTypeComboBox.SelectedItem as ComboBoxItem;
             string funcType = selectedTypeItem?.Content.ToString() ?? "public";
 
-            // POBRANIE KONTEKSTU Z GŁÓWNEGO OKNA
-            var selectedModel = _mainWindow.ModelComboBox.SelectedItem as AiModel;
-            var selectedLanguage = _mainWindow.LanguageComboBox.SelectedItem as Language;
-
-            // 2. WALIDACJA (Bez zmian)
-            if (string.IsNullOrWhiteSpace(funcName) || string.IsNullOrWhiteSpace(funcDesc))
-            {
-                MessageBox.Show("Function Name and Functionalities are required!", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
+            // Walidacja
             if (selectedModel == null || selectedLanguage == null)
             {
-                MessageBox.Show("Model or Language is not selected in the main screen.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Select Model and Language first.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // 3. PAKOWANIE DANYCH (Obiekt DTO jest już gotowy w Twoim projekcie)
-            var requestData = new FunctionRequestDto
+            if (string.IsNullOrWhiteSpace(funcName) || string.IsNullOrWhiteSpace(funcDesc))
             {
-                FunctionName = funcName,
-                FunctionType = funcType,
-                Functionalities = funcDesc,
-                InputParameters = inputParams,
-                ReturnType = returnType,
-                SelectedModel = selectedModel,
-                SelectedLanguage = selectedLanguage
+                MessageBox.Show("Function Name and Description are required!", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Budowanie słownika placeholderów
+            // Klucze muszą odpowiadać tym w szablonie JSON w bazie danych
+            var placeholders = new Dictionary<string, string>
+            {
+                { "{{FunctionName}}", funcName },
+                { "{{FunctionType}}", funcType },
+                { "{{ReturnType}}", returnType },
+                { "{{InputParameters}}", inputParams },
+                { "{{FunctionalityDescription}}", funcDesc }
             };
 
-            // 4. WYSŁANIE DO SERWISU (TUTAJ ZMIANA)
+            // Wywołanie API Ai
             Loading.Visibility = Visibility.Visible;
-
             try
             {
                 OpenAiService service = new OpenAiService();
 
-                // Używamy nowej metody ProcessFunctionRequestAsync, która:
-                // - Zapisuje Question w bazie
-                // - Pobiera PromptTemplate i wypełnia go
-                // - Zapisuje historię do pliku JSON
-                // - Wysyła request do AI
-                // - Zapisuje Result w bazie
-                string result = await service.ProcessFunctionRequestAsync(requestData);
+                string result = await service.ProcessGenerationRequestAsync(
+                    funcName,
+                    "Function",
+                    selectedLanguage,
+                    selectedModel,
+                    placeholders
+                );
 
-                // Sprawdzenie czy serwis zwrócił błąd (Twoja metoda zwraca string z błędem lub kodem)
-                if (result.StartsWith("Error") || result.StartsWith("Connection Error"))
+                if (result.StartsWith("Error"))
                 {
                     MessageBox.Show(result, "Generation Failed", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 else
                 {
-                    // Sukces - przekazujemy wygenerowany kod do widoku wyników
                     ResultsView resultsView = new ResultsView(_mainWindow, result);
                     _mainWindow.MainContentControl.Content = resultsView;
-
-                    // NOWE: Odśwież historię w głównym oknie!
                     _mainWindow.LoadHistory();
-
-                    _mainWindow.MainContentControl.Content = resultsView;
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show($"Critical Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }

@@ -83,7 +83,6 @@ namespace SoftwareFromClick.Views
             {
                 OpenAiService service = new OpenAiService();
 
-                // wywoływana jest nowa metoda do tworzenia kodu (trzeba bedzie przerobić też funkcję w taki sposób)
                 string result = await service.ProcessGenerationRequestAsync(
                     className,
                     "Class",
