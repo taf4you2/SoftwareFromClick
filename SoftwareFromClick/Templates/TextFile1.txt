@@ -1,1 +1,1 @@
-﻿tutaj trzeba będzie dodać docelowo service do inicializacje tych templatów w jakiś sposób
+﻿trzeba będzie funkcje przerobić tak żeby działała na tą sama funkcję co klasa w OpenAi

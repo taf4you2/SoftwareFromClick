@@ -129,6 +129,105 @@ namespace SoftwareFromClick.Services
             }
         }
 
+        public async Task<string> ProcessGenerationRequestAsync(
+            string title,
+            string templateType,
+            Language language,
+            AiModel model,
+            Dictionary<string, string> placeholders
+            )
+        {
+            using (var context = new AppDbContext())
+            {
+                // Walidacja uzytkownika
+                var user = context.Users.FirstOrDefault();
+                if (user == null) return "Error: no user found";
+
+                // Tworzenie wpisu pytania do bazy
+                var newQuestion = new Question
+                {
+                    Title = title,
+                    CreatedAt = DateTime.Now,
+                    UserId = user.Id,
+                    ModelId = model.Id,
+                    LanguageId = language.Id
+
+                };
+                
+                context.Queries.Add( newQuestion );
+                await context.SaveChangesAsync();
+
+                // Pobranie szablonu prompta
+                var promptTemplate = context.PromptTemplates.FirstOrDefault
+                                        (pt => pt.LanguageId == language.Id
+                                         && pt.TemplateType == templateType
+                                         && pt.IsActive);
+                if (promptTemplate == null) return $"Error: no templete {templateType} found for language {language.Name}";
+                if (!File.Exists(promptTemplate.JsonFilePath)) return $"Error: template file not found {promptTemplate.JsonFilePath}";
+
+                // Deserializacja szablonu json
+                string templateContent = await File.ReadAllTextAsync(promptTemplate.JsonFilePath);
+                var templateDto = JsonSerializer.Deserialize<GeneratorTemplateDto>(templateContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (templateDto == null) return "Error: failed to parse prompttemplate from JSON";
+
+                // Zamiana placeholderów na wartości z formularza
+                string finalUserContent = templateDto.User;
+                string finalSystemContent = templateDto.System;
+
+                foreach (var item in placeholders)
+                {
+                    string valueToInsert = item.Value ?? string.Empty; // ?? jest po to żeby w razie null (item) nie było będu tylko empty string
+                    finalSystemContent = finalSystemContent.Replace(item.Key, valueToInsert);
+                    finalUserContent = finalUserContent.Replace(item.Key, valueToInsert);
+                }
+
+                // Zapis promptu do bazy i do pliku
+                string historyFileName = $"prompt_{newQuestion.Id}.json";
+                string savedPromptPath = Path.Combine(_historyFolder, historyFileName);
+                var filledPromptData = new { System = finalSystemContent, User = finalUserContent };
+
+                await File.WriteAllTextAsync(savedPromptPath, JsonSerializer.Serialize(filledPromptData, new JsonSerializerOptions { WriteIndented = true }));
+
+                var newPrompt = new Prompt
+                {
+                    QueryId = newQuestion.Id,
+                    JsonFilePath = savedPromptPath,
+                    CreatedAt = DateTime.Now
+                };
+                context.Prompts.Add(newPrompt);
+
+                // Pobranie dostawcy
+                int providerId = model.ProviderId;
+                var providerTemplate = context.ProviderTemplates.FirstOrDefault(pt => pt.ProviderId == providerId);
+
+                if (providerTemplate == null)
+                    return $"Error: No provider configuration found for Provider ID {providerId}.";
+
+                // Zapis w baze użytych szablonów
+                var usedTemplates = new PromptTemplateUsed
+                {
+                    QueryId = newQuestion.Id,
+                    PromptTemplateId = promptTemplate.Id,
+                    ProviderTemplateId = providerTemplate.Id
+                };
+                context.PromptTemplatesUsed.Add(usedTemplates);
+
+                await context.SaveChangesAsync();
+
+                // Wywołanie AI //za jakie grzechy
+                return await SendRequestToAi(
+                    filledPromptData.System,
+                    filledPromptData.User,
+                    model.ModelName,
+                    newQuestion.Id,
+                    providerTemplate.JsonFilePath,
+                    model.ProviderId
+                );
+            }
+            return null;
+        }
+
         // Metoda pomocnicza realizująca fizyczne połączenie HTTP z API dostawcy.
         // Odpowiada za przygotowanie JSON-a żądania, wysyłkę oraz odebranie odpowiedzi.
         private async Task<string> SendRequestToAi(string systemMsg, string userMsg, string modelName, int queryId, string providerConfigPath, int providerId)
