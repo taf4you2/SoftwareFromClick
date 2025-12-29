@@ -23,16 +23,22 @@ namespace SoftwareFromClick.Views
         private UIElement _welcomeScreen; // 'snap' ekranu poczatkowego
         private readonly MainService _mainService; // Referencja do serwisu
 
+        private readonly TemplateService _templateService;
+
 
         public MainWindow()
         {
             InitializeComponent();
-            _welcomeScreen = MainContentControl.Content as UIElement; // zapis ekranu powitalnego (zeby sie dalo wrocic)
+            _welcomeScreen = MainContentControl.Content as UIElement;
 
-            // Inicjalizacja serwisu
+            // INICJALIZACJA SERWISÓW
             _mainService = new MainService();
+            _templateService = new TemplateService();
 
-            // Ładowanie danych do list rozwijanych
+            // PODPINANIE ZDARZEŃ
+            LanguageComboBox.SelectionChanged += LanguageComboBox_SelectionChanged;
+
+            // ŁADOWANIE DANYCH
             LoadComboBoxData();
             LoadHistory();
         }
@@ -51,30 +57,20 @@ namespace SoftwareFromClick.Views
 
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
-            ComboBoxItem selectedTypeItem = TypeComboBox.SelectedItem as ComboBoxItem;
-            string selectedType = selectedTypeItem?.Content.ToString();
-
+            // Walidacja wyboru
             var selectedModel = ModelComboBox.SelectedItem as AiModel;
             var selectedLanguage = LanguageComboBox.SelectedItem as Language;
+            var selectedTemplate = TemplateComboBox.SelectedItem as PromptTemplate;
 
-            if (selectedType != null && selectedModel != null && selectedLanguage != null)
+            if (selectedModel == null || selectedLanguage == null || selectedTemplate == null)
             {
-                if (selectedType == "Function")
-                {
-                    // tu przerzucamy ustawienia poczatkowe do functionview
-                    FunctionView functionView = new FunctionView(this);
-                    MainContentControl.Content = functionView;
-                }
-                else if (selectedType == "Class")
-                {
-                    ClassView classView = new ClassView(this);
-                    MainContentControl.Content = classView;
-                }
+                MessageBox.Show("Please select Model, Language and Template.");
+                return;
             }
-            else
-            {
-                MessageBox.Show("Please select all options (Model, Language, Type)");
-            }
+
+            // tworzenie nowego widoku przez przekazanie
+            DynamicGeneratorView dynamicView = new DynamicGeneratorView(this, selectedTemplate);
+            MainContentControl.Content = dynamicView;
         }
 
         private void LoadComboBoxData()
@@ -149,6 +145,30 @@ namespace SoftwareFromClick.Views
 
                 // Opcjonalnie: Resetujemy zaznaczenie, żeby można było kliknąć to samo jeszcze raz
                 HistoryListView.SelectedItem = null;
+            }
+        }
+
+        private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (LanguageComboBox.SelectedItem is Language selectedLanguage)
+            {
+                // Pobierz wszystkie szablony i przefiltruj po wybranym języku
+                var allTemplates = _templateService.GetAllTemplates();
+                var filteredTemplates = allTemplates
+                                        .Where(t => t.LanguageId == selectedLanguage.Id)
+                                        .ToList();
+
+                TemplateComboBox.ItemsSource = filteredTemplates;
+
+                // Ustaw pierwszy domyślnie, jeśli istnieje
+                if (filteredTemplates.Count > 0)
+                {
+                    TemplateComboBox.SelectedIndex = 0;
+                }
+                else
+                {
+                    TemplateComboBox.ItemsSource = null;
+                }
             }
         }
 

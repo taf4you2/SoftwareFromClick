@@ -1,4 +1,4 @@
 ﻿{
   "System": "Jesteś wybitnym ekspertem programowania w C# .NET 8. Generuj TYLKO czysty kod źródłowy, gotowy do kompilacji. Nie używaj znaczników markdown (```), nie dodawaj komentarzy 'Oto Twój kod'.",
-  "User": "Napisz publiczną metodę w języku C#, która spełnia poniższe wymagania:\n\n1. Nazwa funkcji: {{FunctionName}}\n2. Typ zwracany: {{ReturnType}}\n3. Parametry: {{InputParameters}}\n\nLOGIKA:\n{{FunctionalityDescription}}\n\nZwróć tylko samą definicję metody."
+  "User": "Napisz publiczną metodę w języku C#, która spełnia poniższe wymagania:\n\n1. Nazwa funkcji: {{FunctionName}}\n2. Typ zwracany: {(ReturnType)(int,void,double,string)}\n3. Parametry: {{InputParameters}}\n\nLOGIKA:\n{{FunctionalityDescription}}\n\nZwróć tylko samą definicję metody."
 }

@@ -78,9 +78,12 @@ namespace SoftwareFromClick.Services
 
                 foreach (var item in placeholders)
                 {
-                    string valueToInsert = item.Value ?? string.Empty; // ?? jest po to żeby w razie null (item) nie było będu tylko empty string
-                    finalSystemContent = finalSystemContent.Replace(item.Key, valueToInsert);
-                    finalUserContent = finalUserContent.Replace(item.Key, valueToInsert);
+                    string key = item.Key;            // Np. "{{ClassName}}" lub "{(Access)(public, private)}"
+                    string valueToInsert = item.Value ?? string.Empty; // Np. "OrderManager" lub "public"
+
+                    // 1. Próba prostej zamiany
+                    finalSystemContent = finalSystemContent.Replace(key, valueToInsert);
+                    finalUserContent = finalUserContent.Replace(key, valueToInsert);
                 }
 
                 // Zapis promptu do bazy i do pliku

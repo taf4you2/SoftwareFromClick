@@ -86,12 +86,14 @@
 
                         <!-- Third ComboBox -->
                         <StackPanel Margin="10">
-                            <TextBlock Text="Select Type" Margin="0,0,0,5" TextAlignment="Center"/>
+                            <TextBlock Text="Select Template" Margin="0,0,0,5" TextAlignment="Center"/>
                             <Border BorderBrush="Black" BorderThickness="1">
-                                <ComboBox x:Name="TypeComboBox" Width="120" Height="25" BorderThickness="0">
-                                    <ComboBoxItem Content="Class"/>
-                                    <ComboBoxItem Content="Function" IsSelected="True"/>
-                                </ComboBox>
+                                <ComboBox x:Name="TemplateComboBox" 
+                                            Width="150" 
+                                            Height="25" 
+                                            BorderThickness="0"
+                                            DisplayMemberPath="Name" 
+                                            SelectedValuePath="Id"/>
                             </Border>
                         </StackPanel>
                     </StackPanel>
