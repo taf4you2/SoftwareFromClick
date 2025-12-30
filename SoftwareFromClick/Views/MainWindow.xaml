@@ -4,7 +4,7 @@
         Title="SoftwareFromClick" Height="700" Width="900">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="140"/>
+            <ColumnDefinition Width="170"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -20,16 +20,43 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <TextBlock Text="history" Margin="5" FontWeight="Bold"/>
-                        <ListView x:Name="HistoryListView" 
-                                  BorderThickness="0" 
-                                  SelectionChanged="HistoryListView_SelectionChanged"
-                                  DisplayMemberPath="Title">
-                        </ListView>
+                        <DataGrid x:Name="HistoryDataGrid" 
+                                    AutoGenerateColumns="False" 
+                                    CanUserAddRows="False" 
+                                    HeadersVisibility="None" 
+                                    GridLinesVisibility="Horizontal" 
+                                    Background="White"
+                                    BorderThickness="0"
+                                    SelectionMode="Single"
+                                    SelectionChanged="HistoryDataGrid_SelectionChanged">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Title}" Width="*" IsReadOnly="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                            <Setter Property="ToolTip" Value="{Binding Title}"/>
+                                            <Setter Property="Padding" Value="5"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <DataGridTemplateColumn Width="70">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="Delete"
+                                                    Width="70"
+                                                    Click="DeleteHistoryButton_Click"
+                                                    Tag="{Binding Id}"
+                                                    ToolTip="Delete from history"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
 
-            
             <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
                 
                 <!-- Prompt Template Button -->
