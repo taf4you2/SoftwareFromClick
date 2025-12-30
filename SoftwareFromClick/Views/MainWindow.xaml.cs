@@ -77,15 +77,15 @@ namespace SoftwareFromClick.Views
         {
             try
             {
-                // 1. Pobierz dane z serwisu
+                // Pobierz dane z serwisu
                 var languages = _mainService.GetLanguages();
                 var models = _mainService.GetAiModels();
 
-                // 2. Przypisz do ComboBoxów
+                // Przypisz do ComboBoxów
                 LanguageComboBox.ItemsSource = languages;
                 ModelComboBox.ItemsSource = models;
 
-                // 3. Opcjonalnie: Zaznacz pierwsze elementy domyślnie
+                // Opcjonalnie: Zaznacz pierwsze elementy domyślnie
                 if (LanguageComboBox.Items.Count > 0) LanguageComboBox.SelectedIndex = 0;
                 if (ModelComboBox.Items.Count > 0) ModelComboBox.SelectedIndex = 0;
             }
@@ -111,18 +111,17 @@ namespace SoftwareFromClick.Views
             try
             {
                 var history = _mainService.GetHistory();
-                HistoryListView.ItemsSource = history;
+                HistoryDataGrid.ItemsSource = history;
             }
             catch (System.Exception ex)
             {
-                // Ciche łapanie błędu przy starcie, żeby nie straszyć usera pustą bazą
                 Console.WriteLine(ex.Message);
             }
         }
 
-        private void HistoryListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void HistoryDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (HistoryListView.SelectedItem is Question selectedQuestion)
+            if (HistoryDataGrid.SelectedItem is Question selectedQuestion)
             {
                 // Sprawdzamy, czy to zapytanie ma jakieś wyniki
                 var lastResult = selectedQuestion.Results
@@ -142,9 +141,32 @@ namespace SoftwareFromClick.Views
                 {
                     MessageBox.Show("No results found for this query.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
+            }
+        }
 
-                // Opcjonalnie: Resetujemy zaznaczenie, żeby można było kliknąć to samo jeszcze raz
-                HistoryListView.SelectedItem = null;
+        private void DeleteHistoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            // zapobiega wywołaniu SelectionChanged na liście po kliknięciu przycisku
+            e.Handled = true;
+
+            if (sender is Button btn && btn.Tag is int questionId)
+            {
+                var result = MessageBox.Show("Confirm Delete");
+
+                if (MessageBox.Show("Delete this history item?", "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        // metoda usuwająca z serwisu
+                        _mainService.DeleteQuestion(questionId);
+
+                        LoadHistory();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"error deleting item: {ex.Message}", "error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
             }
         }
 

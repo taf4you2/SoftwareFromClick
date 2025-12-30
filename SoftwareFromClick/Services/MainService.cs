@@ -66,5 +66,21 @@ namespace SoftwareFromClick.Services
             }
         }
 
+        // obsługa usuwania z historii
+        public void DeleteQuestion(int id)
+        {
+            using (var context = new AppDbContext())
+            {
+                var question = context.Queries.Find(id);
+
+                if (question != null)
+                {
+                    // usuwanie kaskadowe wszystkich rekordów powiązanych
+                    context.Queries.Remove(question); // trzeba docelowo zrobić tak żeby nie usuwało kaskadowo (ale to trzeba zmienić AppDbContext)
+                    context.SaveChanges();
+                }
+            }
+        }
+
     }
 }
