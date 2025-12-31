@@ -2,32 +2,23 @@
 using SoftwareFromClick.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.IO;
 
 namespace SoftwareFromClick.Views
 {
-    /// <summary>
-    /// Interaction logic for DynamicGeneratorView.xaml
-    /// </summary>
     public partial class DynamicGeneratorView : UserControl
     {
         private MainWindow _mainWindow;
         private PromptTemplate _currentTemplate;
 
-        // Słownik mapujący placeholder na kontrolkę, która trzyma wartość
+        // Mapuje identyfikatory placeholderów na utworzone kontrolki.
         private Dictionary<string, Control> _inputControls = new Dictionary<string, Control>();
 
         private readonly TemplateParserService _parserService;
@@ -42,9 +33,7 @@ namespace SoftwareFromClick.Views
             _parserService = new TemplateParserService();
             _openAiService = new OpenAiService();
 
-            // Ustawienie nazwy funkcji jako nazwę szablonu
             HeaderTextBlock.Text = $"Generate: {_currentTemplate.Name}";
-
             LoadDynamicInterface();
         }
 
@@ -58,16 +47,13 @@ namespace SoftwareFromClick.Views
                     return;
                 }
 
-                // Wczytanie treści JSON szablonu
                 string jsonContent = await File.ReadAllTextAsync(_currentTemplate.JsonFilePath);
                 var templateDto = JsonSerializer.Deserialize<GeneratorTemplateDto>(jsonContent);
 
                 if (templateDto == null) return;
 
-                // Wykrycie pól
+                // Ekstrahuje pola formularza z szablonów system i user.
                 var fields = _parserService.ExtractFields(templateDto.System, templateDto.User);
-
-                // Generowanie pól
                 GenerateControls(fields);
             }
             catch (Exception ex)
@@ -76,7 +62,6 @@ namespace SoftwareFromClick.Views
             }
         }
 
-
         private void GenerateControls(List<TemplateField> fields)
         {
             DynamicFormPanel.Children.Clear();
@@ -84,87 +69,174 @@ namespace SoftwareFromClick.Views
 
             foreach (var field in fields)
             {
-                // Kontener dla pojedynczego pola
                 StackPanel fieldPanel = new StackPanel { Margin = new Thickness(0, 0, 0, 15) };
 
-                // Kontrolka wejściowa 
+                // Tworzy i dodaje etykietę pola.
+                TextBlock label = new TextBlock
+                {
+                    Text = field.Label + ":",
+                    FontWeight = FontWeights.SemiBold,
+                    Margin = new Thickness(0, 0, 0, 5)
+                };
+                fieldPanel.Children.Add(label);
+
                 Control inputControl = null;
                 Border border = new Border { BorderBrush = Brushes.Black, BorderThickness = new Thickness(1) };
 
-                if (field.Type == InputFieldType.Choice)
+                if (field.Type == InputFieldType.Text)
                 {
-                    // Etykieta (Label)
-                    TextBlock label = new TextBlock
+                    // Konfiguruje pole tekstowe z obsługą wielu linii dla opisów.
+                    var textBox = new TextBox
                     {
-                        Text = field.Label + ":",
-                        FontWeight = FontWeights.SemiBold,
-                        Margin = new Thickness(0, 0, 0, 5)
+                        Height = field.Label.ToLower().Contains("description") ? 80 : 30,
+                        AcceptsReturn = true,
+                        TextWrapping = TextWrapping.Wrap,
+                        BorderThickness = new Thickness(0),
+                        Padding = new Thickness(2)
                     };
-                    fieldPanel.Children.Add(label);
-
-                    // Tworzenie ComboBox
+                    inputControl = textBox;
+                    border.Child = inputControl;
+                    fieldPanel.Children.Add(border);
+                }
+                else if (field.Type == InputFieldType.Choice)
+                {
+                    // Tworzy listę rozwijaną z opcjami z definicji pola.
                     var comboBox = new ComboBox
                     {
                         ItemsSource = field.Options,
-                        Height = 25,
+                        Height = 30,
                         BorderThickness = new Thickness(0),
-                        SelectedIndex = 0 // Domyślnie pierwsza opcja
+                        SelectedIndex = 0
                     };
                     inputControl = comboBox;
+                    border.Child = inputControl;
+                    fieldPanel.Children.Add(border);
                 }
                 else if (field.Type == InputFieldType.Boolean)
                 {
-                    // Tworzenie Checkbox
+                    // Dodaje pole wyboru (checkbox).
                     var checkBox = new CheckBox
                     {
-                        Content = field.Label,
+                        Content = "Enable",
                         IsChecked = false,
-                        Height = 25,
+                        Height = 30,
                         VerticalContentAlignment = VerticalAlignment.Center,
                         Margin = new Thickness(5, 0, 0, 0)
                     };
                     inputControl = checkBox;
+                    fieldPanel.Children.Add(inputControl);
                 }
-                else
+                else if (field.Type == InputFieldType.ParameterList)
                 {
-                    // Etykieta (Label)
-                    TextBlock label = new TextBlock
-                    {
-                        Text = field.Label + ":",
-                        FontWeight = FontWeights.SemiBold,
-                        Margin = new Thickness(0, 0, 0, 5)
-                    };
-                    fieldPanel.Children.Add(label);
+                    var collection = new ObservableCollection<ParameterItem>();
 
-                    // Tworzenie TextBox
-                    var textBox = new TextBox
+                    var dataGrid = new DataGrid
                     {
-                        Height = field.Label.ToLower().Contains("description") || field.Label.ToLower().Contains("content") ? 80 : 30, // Większe pole dla opisów
-                        AcceptsReturn = true,
-                        TextWrapping = TextWrapping.Wrap,
-                        BorderThickness = new Thickness(0),
-                        VerticalContentAlignment = VerticalAlignment.Center,
-                        Padding = new Thickness(2)
+                        ItemsSource = collection,
+                        AutoGenerateColumns = false,
+                        CanUserAddRows = false,
+                        Height = 150,
+                        BorderThickness = new Thickness(1),
+                        Background = Brushes.White,
+                        HeadersVisibility = DataGridHeadersVisibility.Column,
+                        GridLinesVisibility = DataGridGridLinesVisibility.All,
+                        VerticalGridLinesBrush = Brushes.Black,
+                        HorizontalGridLinesBrush = Brushes.Black
                     };
-                    inputControl = textBox;
+
+                    var typeColumn = new DataGridTemplateColumn
+                    {
+                        Header = "Type",
+                        Width = new DataGridLength(1, DataGridLengthUnitType.Star)
+                    };
+
+                    var typeTemplate = new DataTemplate();
+                    var comboBox = new FrameworkElementFactory(typeof(ComboBox));
+
+                    comboBox.SetValue(ComboBox.ItemsSourceProperty, Enum.GetValues(typeof(ParameterType)));
+
+                    comboBox.SetBinding(ComboBox.SelectedItemProperty, new Binding("Type")
+                    {
+                        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                    });
+
+                    typeTemplate.VisualTree = comboBox;
+                    typeColumn.CellTemplate = typeTemplate;
+
+                    var nameColumn = new DataGridTextColumn
+                    {
+                        Header = "Name",
+                        Width = new DataGridLength(2, DataGridLengthUnitType.Star),
+                        Binding = new Binding("Name")
+                    };
+
+                    var deleteColumn = new DataGridTemplateColumn
+                    {
+                        Header = "Actions",
+                        Width = 70
+                    };
+
+                    var template = new DataTemplate();
+                    var deleteButton = new FrameworkElementFactory(typeof(Button));
+                    deleteButton.SetValue(Button.ContentProperty, "Delete");
+                    deleteButton.SetValue(Button.WidthProperty, 70.0);
+
+
+                    deleteButton.AddHandler(Button.ClickEvent, new RoutedEventHandler((s, e) =>
+                    {
+                        if (s is Button btn && btn.DataContext is ParameterItem itemToRemove)
+                        {
+                            collection.Remove(itemToRemove);
+                            e.Handled = true;
+                        }
+                    }));
+
+                    template.VisualTree = deleteButton;
+                    deleteColumn.CellTemplate = template;
+
+                    dataGrid.Columns.Add(typeColumn);
+                    dataGrid.Columns.Add(nameColumn);
+                    dataGrid.Columns.Add(deleteColumn);
+
+
+                    var addButton = new Button
+                    {
+                        Content = "+ Add Parameter",
+                        Height = 22,
+                        Padding = new Thickness(10, 0, 10, 0),
+                        Background = new SolidColorBrush(Color.FromRgb(240, 240, 240))
+                    };
+
+                    addButton.Click += (s, e) =>
+                    {
+                        collection.Add(new ParameterItem());
+                    };
+
+                    border.Child = dataGrid;
+                    var container = new StackPanel();
+                    container.Children.Add(border);
+                    container.Children.Add(addButton);
+
+                    fieldPanel.Children.Add(container);
+
+
+                    inputControl = dataGrid;
                 }
 
-                // Dodanie kontrolki do obramowania i panelu
-                border.Child = inputControl;
-                fieldPanel.Children.Add(border);
+                if (!DynamicFormPanel.Children.Contains(fieldPanel))
+                {
+                    DynamicFormPanel.Children.Add(fieldPanel);
+                }
 
-                // Dodanie panelu pola do głównego widoku
-                DynamicFormPanel.Children.Add(fieldPanel);
-
-                // Zapisanie referencji w słowniku
-                // Kluczem jest Placeholder (np. "{{Author}}"), wartością TextBox/ComboBox
-                _inputControls.Add(field.Placeholder, inputControl);
+                if (inputControl != null && !_inputControls.ContainsKey(field.Placeholder))
+                {
+                    _inputControls.Add(field.Placeholder, inputControl);
+                }
             }
         }
 
         private async void GenerateCodeButton_Click(object sender, RoutedEventArgs e)
         {
-            // Zbieranie danych z formularza
             var placeholders = new Dictionary<string, string>();
 
             foreach (var entry in _inputControls)
@@ -174,60 +246,51 @@ namespace SoftwareFromClick.Views
                 if (entry.Value is TextBox tb)
                 {
                     value = tb.Text.Trim();
+                    // Przerywa działanie, jeśli wymagane pole tekstowe jest puste
                     if (string.IsNullOrEmpty(value))
                     {
-                        MessageBox.Show("Please fill in all fields.");
+                        MessageBox.Show($"Field {entry.Key} is empty.");
                         return;
                     }
                 }
-                else if (entry.Value is ComboBox cb)
+                else if (entry.Value is ComboBox cb && !(entry.Value is DataGrid))
                 {
                     value = cb.SelectedValue?.ToString() ?? string.Empty;
                 }
                 else if (entry.Value is CheckBox chk)
                 {
-                    // Zamienia zaznaczenie na tekst "true" lub "false"
                     value = chk.IsChecked == true ? "true" : "false";
+                }
+                else if (entry.Value is DataGrid dg)
+                {
+                    // Przetwarza dane z tabeli parametrów na format tekstowy
+                    if (dg.ItemsSource is ObservableCollection<ParameterItem> items)
+                    {
+                        var paramsList = items
+                            .Where(i => !string.IsNullOrWhiteSpace(i.Name))
+                            .Select(i => $"{i.Type.ToString().ToLower()} {i.Name}");
+
+                        value = string.Join(", ", paramsList);
+                    }
                 }
 
                 placeholders.Add(entry.Key, value);
             }
 
-            // Walidacja
             var selectedModel = _mainWindow.ModelComboBox.SelectedItem as AiModel;
             var selectedLanguage = _mainWindow.LanguageComboBox.SelectedItem as Language;
 
-            if (selectedModel == null || selectedLanguage == null)
-            {
-                MessageBox.Show("Please select Model and Language in the main window sidebar.");
-                return;
-            }
+            if (selectedModel == null || selectedLanguage == null) return;
 
-            // Domyślnie używa nazwy szablonu
+            // Ustawia tytuł historii na podstawie nazwy wpisu lub szablonu
             string titleToSave = _currentTemplate.Name;
-
-            // Szuka klucza zawierającego frazę "Name"
             var nameEntry = placeholders.FirstOrDefault(p => p.Key.Contains("Name", StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrEmpty(nameEntry.Key)) titleToSave = nameEntry.Value;
 
-            // Sprawdza czy znaleziono pasujący klucz i czy ma wartość
-            if (!string.IsNullOrEmpty(nameEntry.Key))
-            {
-                titleToSave = nameEntry.Value;
-            }
-            else
-            {
-                // Alternatywnie: pobiera wartość z pierwszego pola tekstowego jeśli nie znaleziono "Name"
-                var firstValue = placeholders.Values.FirstOrDefault();
-                if (!string.IsNullOrEmpty(firstValue))
-                {
-                    titleToSave = firstValue.Length > 20 ? firstValue.Substring(0, 20) + "..." : firstValue;
-                }
-            }
-
-            // Wysłanie żądania
             Loading.Visibility = Visibility.Visible;
             try
             {
+                // Wysyła żądanie generowania kodu do serwisu AI
                 string result = await _openAiService.ProcessGenerationRequestAsync(
                     titleToSave,
                     _currentTemplate.TemplateType,
@@ -242,6 +305,7 @@ namespace SoftwareFromClick.Views
                 }
                 else
                 {
+                    // Przekazuje wynik do widoku rezultatów i odświeża historię
                     ResultsView resultsView = new ResultsView(_mainWindow, result);
                     _mainWindow.MainContentControl.Content = resultsView;
                     _mainWindow.LoadHistory();

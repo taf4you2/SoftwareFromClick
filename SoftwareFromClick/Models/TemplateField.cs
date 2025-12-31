@@ -8,9 +8,10 @@ namespace SoftwareFromClick.Models
 {
     public enum InputFieldType
     {
-        Text,   // odpowiada za textblock
-        Choice, // odpowiada za combobox
-        Boolean // odpowiada za checkbox
+        Text,           // odpowiada za textblock
+        Choice,         // odpowiada za combobox
+        Boolean,        // odpowiada za checkbox
+        ParameterList   // odpowiaza za parametry (trzeba to będzie ustandaryzować do normalnego użytku)
     }
 
     public class TemplateField
@@ -20,5 +21,20 @@ namespace SoftwareFromClick.Models
         public InputFieldType Type { get; set; }                // typ (text,combo)
         public List<string> Options { get; set; } = new();      // lista opcji (tylko) dla combox
 
+    }
+
+    public enum ParameterType
+    {
+        Int,
+        Double,
+        Void,
+        String,
+        Char
+    }
+
+    public class ParameterItem
+    {
+        public string Type { get; set; } = "int";
+        public string Name { get; set; } = string.Empty;
     }
 }

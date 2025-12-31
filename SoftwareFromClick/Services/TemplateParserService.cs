@@ -16,6 +16,8 @@ namespace SoftwareFromClick.Services
         private static readonly Regex _choicePattern = new Regex(@"\{\((?<label>[^)]+)\)\((?<options>[^)]+)\)\}", RegexOptions.Compiled);
         // dla checkbox
         private static readonly Regex _boolPattern = new Regex(@"\{\<(?<label>.*?)\>\}", RegexOptions.Compiled);
+        // dla parametrów lub pól klasy
+        private static readonly Regex _listPattern = new Regex(@"\{\[(?<label>.*?)\]\}", RegexOptions.Compiled);
 
         public List<TemplateField> ExtractFields(string systemPrompt, string userPrompt)
         {
@@ -74,7 +76,7 @@ namespace SoftwareFromClick.Services
                 });
             }
 
-            //szukam checkbox w tekscie
+            // szukam checkbox w tekscie
             var boolMatches = _boolPattern.Matches(text);
             foreach (Match match in boolMatches)
             {
@@ -83,6 +85,17 @@ namespace SoftwareFromClick.Services
                     Label = match.Groups["label"].Value,
                     Placeholder = match.Value, // np "{<czy komentowac>}"
                     Type = InputFieldType.Boolean
+                });
+            }
+
+            // szukam parametrow
+            foreach (Match match in _listPattern.Matches(text))
+            {
+                detectedFields.Add(new TemplateField
+                {
+                    Label = match.Groups["label"].Value,
+                    Placeholder = match.Value,
+                    Type = InputFieldType.ParameterList
                 });
             }
 
