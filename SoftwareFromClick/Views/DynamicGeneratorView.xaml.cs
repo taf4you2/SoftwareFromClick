@@ -106,7 +106,7 @@ namespace SoftwareFromClick.Views
                     var comboBox = new ComboBox
                     {
                         ItemsSource = field.Options,
-                        Height = 30,
+                        Height = 25,
                         BorderThickness = new Thickness(0),
                         SelectedIndex = 0 // Domyślnie pierwsza opcja
                     };
@@ -119,7 +119,7 @@ namespace SoftwareFromClick.Views
                     {
                         Content = field.Label,
                         IsChecked = false,
-                        Height = 30,
+                        Height = 25,
                         VerticalContentAlignment = VerticalAlignment.Center,
                         Margin = new Thickness(5, 0, 0, 0)
                     };

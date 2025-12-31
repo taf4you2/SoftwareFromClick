@@ -63,7 +63,7 @@
             </ScrollViewer>
         </Border>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="20">
             <Border BorderBrush="Black" BorderThickness="1">
                 <Button Content="Back" Width="80" Height="30" BorderThickness="0" Click="CloseButton_Click"/>
             </Border>
