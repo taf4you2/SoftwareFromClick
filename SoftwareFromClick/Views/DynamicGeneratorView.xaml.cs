@@ -76,6 +76,7 @@ namespace SoftwareFromClick.Views
             }
         }
 
+
         private void GenerateControls(List<TemplateField> fields)
         {
             DynamicFormPanel.Children.Clear();
@@ -86,21 +87,21 @@ namespace SoftwareFromClick.Views
                 // Kontener dla pojedynczego pola
                 StackPanel fieldPanel = new StackPanel { Margin = new Thickness(0, 0, 0, 15) };
 
-                // Etykieta (Label)
-                TextBlock label = new TextBlock
-                {
-                    Text = field.Label + ":",
-                    FontWeight = FontWeights.SemiBold,
-                    Margin = new Thickness(0, 0, 0, 5)
-                };
-                fieldPanel.Children.Add(label);
-
                 // Kontrolka wejściowa 
                 Control inputControl = null;
                 Border border = new Border { BorderBrush = Brushes.Black, BorderThickness = new Thickness(1) };
 
                 if (field.Type == InputFieldType.Choice)
                 {
+                    // Etykieta (Label)
+                    TextBlock label = new TextBlock
+                    {
+                        Text = field.Label + ":",
+                        FontWeight = FontWeights.SemiBold,
+                        Margin = new Thickness(0, 0, 0, 5)
+                    };
+                    fieldPanel.Children.Add(label);
+
                     // Tworzenie ComboBox
                     var comboBox = new ComboBox
                     {
@@ -111,8 +112,30 @@ namespace SoftwareFromClick.Views
                     };
                     inputControl = comboBox;
                 }
+                else if (field.Type == InputFieldType.Boolean)
+                {
+                    // Tworzenie Checkbox
+                    var checkBox = new CheckBox
+                    {
+                        Content = field.Label,
+                        IsChecked = false,
+                        Height = 30,
+                        VerticalContentAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(5, 0, 0, 0)
+                    };
+                    inputControl = checkBox;
+                }
                 else
                 {
+                    // Etykieta (Label)
+                    TextBlock label = new TextBlock
+                    {
+                        Text = field.Label + ":",
+                        FontWeight = FontWeights.SemiBold,
+                        Margin = new Thickness(0, 0, 0, 5)
+                    };
+                    fieldPanel.Children.Add(label);
+
                     // Tworzenie TextBox
                     var textBox = new TextBox
                     {
@@ -160,6 +183,11 @@ namespace SoftwareFromClick.Views
                 else if (entry.Value is ComboBox cb)
                 {
                     value = cb.SelectedValue?.ToString() ?? string.Empty;
+                }
+                else if (entry.Value is CheckBox chk)
+                {
+                    // Zamienia zaznaczenie na tekst "true" lub "false"
+                    value = chk.IsChecked == true ? "true" : "false";
                 }
 
                 placeholders.Add(entry.Key, value);

@@ -9,7 +9,8 @@ namespace SoftwareFromClick.Models
     public enum InputFieldType
     {
         Text,   // odpowiada za textblock
-        Choice  // odpowiada za combobox
+        Choice, // odpowiada za combobox
+        Boolean // odpowiada za checkbox
     }
 
     public class TemplateField

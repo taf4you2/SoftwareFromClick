@@ -54,8 +54,7 @@ namespace SoftwareFromClick.Services
 
                 string jsonContent = File.ReadAllText(jsonFilePath);
 
-                // Deserializujemy strukturę odpowiedzi OpenAI (korzystamy z klas z OpenAiService)
-                // Uwaga: Upewnij się, że klasy OpenAiResponse są publiczne i dostępne
+                // Deserializujemy strukturę odpowiedzi OpenAI
                 var response = JsonSerializer.Deserialize<OpenAiResponse>(jsonContent);
 
                 return response?.Choices?[0]?.Message?.Content ?? "No code found in history file.";
