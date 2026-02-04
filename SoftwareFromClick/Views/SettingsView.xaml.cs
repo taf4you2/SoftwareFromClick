@@ -33,10 +33,26 @@ namespace SoftwareFromClick.Views
         {
             InitializeComponent();
             _mainWindow = mainWindow;
-
             _apiKeyService = new ApiKeyService();
 
+            LoadProviders(); // Nowa metoda
             LoadApiKeys();
+        }
+
+        private void LoadProviders()
+        {
+            try
+            {
+                var providers = _apiKeyService.GetProviders();
+                ProviderComboBox.ItemsSource = providers;
+
+                // Ustaw domyślnie pierwszy element (np. Gemini lub OpenAI)
+                if (providers.Count > 0) ProviderComboBox.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading providers: {ex.Message}");
+            }
         }
 
         private void LoadApiKeys()
@@ -47,9 +63,16 @@ namespace SoftwareFromClick.Views
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             string newKey = KeyTextBox.Text.Trim();
-            string providerName = (ProviderComboBox.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Unknown";
 
-            if (providerName.Contains("OpenAI")) providerName = "OpenAI";
+            // Zmiana: pobieramy obiekt Provider z zaznaczenia
+            var selectedProvider = ProviderComboBox.SelectedItem as Provider;
+            string providerName = selectedProvider?.Name ?? "Unknown";
+
+            if (selectedProvider == null)
+            {
+                MessageBox.Show("Please select a provider.");
+                return;
+            }
 
             if (string.IsNullOrEmpty(newKey))
             {

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SoftwareFromClick.Data;
 using SoftwareFromClick.Models;
+// Jeśli twoje OpenAiRequestDto jest w osobnym namespace, odkomentuj poniższą linię:
+using SoftwareFromClick.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,22 +15,16 @@ using System.Threading.Tasks;
 
 namespace SoftwareFromClick.Services
 {
-    // Główny serwis odpowiedzialny za komunikację z modelami sztucznej inteligencji.
-    // Zarządza procesem przygotowania promptu, wysyłki żądania oraz zapisu historii.
     public class OpenAiService
     {
-        // Ścieżki do folderów przechowywujących historię wygenerowanych promptów oraz otrzymanych wyników.
         private readonly string _historyFolder = Path.Combine(AppContext.BaseDirectory, "History", "Prompts");
         private readonly string _resultsFolder = Path.Combine(AppContext.BaseDirectory, "History", "Results");
 
-        // Konstruktor podczas inicjalizacji sprawdza istnienie wymaganych katalogów i tworzy je, jeśli nie istnieją.
         public OpenAiService()
         {
             if (!Directory.Exists(_historyFolder)) Directory.CreateDirectory(_historyFolder);
             if (!Directory.Exists(_resultsFolder)) Directory.CreateDirectory(_resultsFolder);
         }
-
-        // Główna metoda asynchroniczna przetwarzająca generowanie wszystkiego (pewnie będzie zmieniana jeszcze)
 
         public async Task<string> ProcessGenerationRequestAsync(
             string title,
@@ -40,11 +36,9 @@ namespace SoftwareFromClick.Services
         {
             using (var context = new AppDbContext())
             {
-                // Walidacja uzytkownika
                 var user = context.Users.FirstOrDefault();
                 if (user == null) return "Error: no user found";
 
-                // Tworzenie wpisu pytania do bazy
                 var newQuestion = new Question
                 {
                     Title = title,
@@ -52,41 +46,35 @@ namespace SoftwareFromClick.Services
                     UserId = user.Id,
                     ModelId = model.Id,
                     LanguageId = language.Id
-
                 };
-                
-                context.Queries.Add( newQuestion );
+
+                context.Queries.Add(newQuestion);
                 await context.SaveChangesAsync();
 
-                // Pobranie szablonu prompta
-                var promptTemplate = context.PromptTemplates.FirstOrDefault
-                                        (pt => pt.LanguageId == language.Id
+                var promptTemplate = context.PromptTemplates.FirstOrDefault(pt => pt.LanguageId == language.Id
                                          && pt.TemplateType == templateType
                                          && pt.IsActive);
-                if (promptTemplate == null) return $"Error: no templete {templateType} found for language {language.Name}";
+
+                if (promptTemplate == null) return $"Error: no template {templateType} found for language {language.Name}";
                 if (!File.Exists(promptTemplate.JsonFilePath)) return $"Error: template file not found {promptTemplate.JsonFilePath}";
 
-                // Deserializacja szablonu json
                 string templateContent = await File.ReadAllTextAsync(promptTemplate.JsonFilePath);
                 var templateDto = JsonSerializer.Deserialize<GeneratorTemplateDto>(templateContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 if (templateDto == null) return "Error: failed to parse prompttemplate from JSON";
 
-                // Zamiana placeholderów na wartości z formularza
                 string finalUserContent = templateDto.User;
                 string finalSystemContent = templateDto.System;
 
                 foreach (var item in placeholders)
                 {
-                    string key = item.Key;            // Np. "{{ClassName}}" lub "{(Access)(public, private)}"
-                    string valueToInsert = item.Value ?? string.Empty; // Np. "OrderManager" lub "public"
+                    string key = item.Key;
+                    string valueToInsert = item.Value ?? string.Empty;
 
-                    // 1. Próba prostej zamiany
                     finalSystemContent = finalSystemContent.Replace(key, valueToInsert);
                     finalUserContent = finalUserContent.Replace(key, valueToInsert);
                 }
 
-                // Zapis promptu do bazy i do pliku
                 string historyFileName = $"prompt_{newQuestion.Id}.json";
                 string savedPromptPath = Path.Combine(_historyFolder, historyFileName);
                 var filledPromptData = new { System = finalSystemContent, User = finalUserContent };
@@ -101,14 +89,12 @@ namespace SoftwareFromClick.Services
                 };
                 context.Prompts.Add(newPrompt);
 
-                // Pobranie dostawcy
                 int providerId = model.ProviderId;
                 var providerTemplate = context.ProviderTemplates.FirstOrDefault(pt => pt.ProviderId == providerId);
 
                 if (providerTemplate == null)
                     return $"Error: No provider configuration found for Provider ID {providerId}.";
 
-                // Zapis w baze użytych szablonów
                 var usedTemplates = new PromptTemplateUsed
                 {
                     QueryId = newQuestion.Id,
@@ -119,7 +105,6 @@ namespace SoftwareFromClick.Services
 
                 await context.SaveChangesAsync();
 
-                // Wywołanie AI //za jakie grzechy
                 return await SendRequestToAi(
                     filledPromptData.System,
                     filledPromptData.User,
@@ -129,32 +114,31 @@ namespace SoftwareFromClick.Services
                     model.ProviderId
                 );
             }
-            return null;
         }
 
-        // Metoda pomocnicza realizująca fizyczne połączenie HTTP z API dostawcy.
-        // Odpowiada za przygotowanie JSON-a żądania, wysyłkę oraz odebranie odpowiedzi.
         private async Task<string> SendRequestToAi(string systemMsg, string userMsg, string modelName, int queryId, string providerConfigPath, int providerId)
         {
-            // System pobiera dynamicznie klucz API oraz adres URL punktu końcowego dla wskazanego dostawcy.
             var (apiKey, apiUrl) = GetProviderDetails(providerId);
 
-            // Sprawdzana jest poprawność pobranych danych uwierzytelniających.
+            // Zabezpieczenie przed białymi znakami (np. spacja na końcu linku)
+            apiKey = apiKey?.Trim();
+            apiUrl = apiUrl?.Trim();
+
             if (string.IsNullOrEmpty(apiKey)) return "Error: API Key not found for this provider. Please add it in Settings.";
             if (string.IsNullOrEmpty(apiUrl)) return "Error: Provider URL is missing in database.";
 
-            OpenAiRequestDto requestData;
+            // Wykrywanie Gemini po URL
+            if (apiUrl.Contains("google") || apiUrl.Contains("generativelanguage"))
+            {
+                return await SendRequestToGemini(systemMsg, userMsg, modelName, queryId, apiKey, apiUrl);
+            }
 
+            // --- Logika dla OpenAI ---
+            OpenAiRequestDto requestData;
             try
             {
-                // Wczytywana jest konfiguracja żądania z pliku JSON dostawcy.
                 string jsonContent = await File.ReadAllTextAsync(providerConfigPath);
-
-                var options = new JsonSerializerOptions
-                {
-                    ReadCommentHandling = JsonCommentHandling.Skip,
-                    PropertyNameCaseInsensitive = true
-                };
+                var options = new JsonSerializerOptions { ReadCommentHandling = JsonCommentHandling.Skip, PropertyNameCaseInsensitive = true };
                 requestData = JsonSerializer.Deserialize<OpenAiRequestDto>(jsonContent, options);
             }
             catch (Exception ex)
@@ -164,10 +148,7 @@ namespace SoftwareFromClick.Services
 
             if (requestData == null) return "Error: Provider config is empty.";
 
-            // Obiekt żądania jest aktualizowany o nazwę modelu wybraną przez użytkownika.
             requestData.Model = modelName;
-
-            // Lista wiadomości w żądaniu jest nadpisywana treściami wygenerowanymi z szablonów promptu.
             requestData.Messages = new List<MessageDto>
             {
                 new MessageDto { Role = "system", Content = systemMsg },
@@ -176,28 +157,23 @@ namespace SoftwareFromClick.Services
 
             using (HttpClient client = new HttpClient())
             {
-                // Klient HTTP ustawia nagłówek autoryzacyjny oraz wydłużony czas oczekiwania na odpowiedź.
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
                 client.Timeout = TimeSpan.FromSeconds(90);
 
                 try
                 {
-                    // Wysyłane jest żądanie POST pod dynamicznie pobrany adres URL (apiUrl).
                     var response = await client.PostAsJsonAsync(apiUrl, requestData);
                     string responseString = await response.Content.ReadAsStringAsync();
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        return $"Error: {response.StatusCode}. Details: {responseString}";
+                        return $"Error ({response.StatusCode}): {responseString}";
                     }
 
-                    // Odpowiedź JSON jest deserializowana, a wygenerowany kod wyciągany z właściwej struktury.
                     var responseBody = JsonSerializer.Deserialize<OpenAiResponse>(responseString);
                     string generatedCode = responseBody?.Choices?[0]?.Message?.Content ?? "No content returned";
 
-                    // Wynik działania jest zapisywany w historii.
                     await SaveResultAsync(queryId, responseString, generatedCode);
-
                     return generatedCode;
                 }
                 catch (Exception ex)
@@ -207,7 +183,71 @@ namespace SoftwareFromClick.Services
             }
         }
 
-        // Metoda asynchroniczna zapisująca surową odpowiedź JSON oraz wyekstrahowany kod do pliku i bazy danych.
+        private async Task<string> SendRequestToGemini(string systemMsg, string userMsg, string modelName, int queryId, string apiKey, string baseUrl)
+        {
+            string requestUrl = "";
+            try
+            {
+                // Budowanie URL: BaseUrl + ModelName + :generateContent?key=API_KEY
+                string cleanBaseUrl = baseUrl.TrimEnd('/');
+
+                // Usunięcie prefiksu "models/", jeśli użytkownik go wpisał w bazie
+                string cleanModelName = modelName.StartsWith("models/") ? modelName.Replace("models/", "") : modelName;
+                cleanModelName = cleanModelName.Trim();
+
+                requestUrl = $"{cleanBaseUrl}/{cleanModelName}:generateContent?key={apiKey}";
+
+                // Budowanie Body dla Gemini
+                var requestData = new GeminiRequestDto
+                {
+                    Contents = new List<GeminiContent>
+                    {
+                        new GeminiContent
+                        {
+                            Role = "user",
+                            Parts = new List<GeminiPart>
+                            {
+                                // Łączymy System i User Prompt
+                                new GeminiPart { Text = $"{systemMsg}\n\n---\n\n{userMsg}" }
+                            }
+                        }
+                    }
+                };
+
+                using (HttpClient client = new HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(90);
+
+                    var response = await client.PostAsJsonAsync(requestUrl, requestData);
+                    string responseString = await response.Content.ReadAsStringAsync();
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        // Zwracamy URL w błędzie (z ukrytym kluczem), żeby łatwiej debugować
+                        string maskedUrl = requestUrl.Replace(apiKey, "***");
+                        return $"Gemini Error ({response.StatusCode}). URL: {maskedUrl}. Details: {responseString}";
+                    }
+
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var responseBody = JsonSerializer.Deserialize<GeminiResponse>(responseString, options);
+
+                    string generatedCode = responseBody?.Candidates?[0]?.Content?.Parts?[0]?.Text;
+
+                    if (string.IsNullOrEmpty(generatedCode))
+                    {
+                        generatedCode = "No content returned from Gemini.";
+                    }
+
+                    await SaveResultAsync(queryId, responseString, generatedCode);
+                    return generatedCode;
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"Gemini Connection Error: {ex.Message}";
+            }
+        }
+
         private async Task SaveResultAsync(int queryId, string fullJson, string generatedCode)
         {
             using (var context = new AppDbContext())
@@ -215,10 +255,8 @@ namespace SoftwareFromClick.Services
                 string fileName = $"{queryId}_result.json";
                 string filePath = Path.Combine(_resultsFolder, fileName);
 
-                // Zapisywana jest pełna treść odpowiedzi JSON na dysku.
                 await File.WriteAllTextAsync(filePath, fullJson);
 
-                // W bazie danych tworzony jest wpis rejestrujący sukces operacji i ścieżkę do pliku wyniku.
                 var result = new Result
                 {
                     QueryId = queryId,
@@ -232,20 +270,16 @@ namespace SoftwareFromClick.Services
             }
         }
 
-        // Metoda pomocnicza pobierająca szczegóły dostawcy z bazy danych.
-        // Zwraca krotkę (Tuple) zawierającą klucz API oraz adres URL.
         private (string ApiKey, string Url) GetProviderDetails(int providerId)
         {
             using (var context = new AppDbContext())
             {
-                // Pobierany jest rekord dostawcy wraz z powiązanymi kluczami API.
                 var provider = context.Providers
                     .Include(p => p.ApiKeys)
                     .FirstOrDefault(p => p.Id == providerId);
 
                 if (provider == null) return (null, null);
 
-                // System wybiera najnowszy aktywny klucz API dla danego dostawcy.
                 var keyEntity = provider.ApiKeys
                     .Where(k => k.IsActive)
                     .OrderByDescending(k => k.CreatedAt)
@@ -256,4 +290,40 @@ namespace SoftwareFromClick.Services
         }
     }
 
+    // --- KLASY DTO DLA GEMINI ---
+    public class GeminiRequestDto
+    {
+        [JsonPropertyName("contents")]
+        public List<GeminiContent> Contents { get; set; } = new();
+    }
+
+    public class GeminiContent
+    {
+        [JsonPropertyName("role")]
+        public string Role { get; set; } = "user";
+
+        [JsonPropertyName("parts")]
+        public List<GeminiPart> Parts { get; set; } = new();
+    }
+
+    public class GeminiPart
+    {
+        [JsonPropertyName("text")]
+        public string Text { get; set; }
+    }
+
+    public class GeminiResponse
+    {
+        [JsonPropertyName("candidates")]
+        public List<GeminiCandidate> Candidates { get; set; }
+    }
+
+    public class GeminiCandidate
+    {
+        [JsonPropertyName("content")]
+        public GeminiContent Content { get; set; }
+
+        [JsonPropertyName("finishReason")]
+        public string FinishReason { get; set; }
+    }
 }

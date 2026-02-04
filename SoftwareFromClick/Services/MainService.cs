@@ -1,5 +1,6 @@
 ﻿using SoftwareFromClick.Data;
 using SoftwareFromClick.Models;
+using SoftwareFromClick.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,20 +47,57 @@ namespace SoftwareFromClick.Services
         }
 
         // Metoda pomocnicza do wyciągania kodu z zapisanego pliku JSON
-        public string GetCodeFromResult(string jsonFilePath)
+        public string GetCodeFromResult(string filePath)
         {
             try
             {
-                if (!File.Exists(jsonFilePath)) return "Error: File not found.";
+                if (!File.Exists(filePath)) return "Error: File not found.";
 
-                string jsonContent = File.ReadAllText(jsonFilePath);
+                // Wczytaj treść pliku
+                string content = File.ReadAllText(filePath);
+                string extension = Path.GetExtension(filePath).ToLower();
 
-                // Deserializujemy strukturę odpowiedzi OpenAI
-                var response = JsonSerializer.Deserialize<OpenAiResponse>(jsonContent);
+                // Jeśli to plik JSON, próbujemy dopasować go do znanych formatów (OpenAI lub Gemini)
+                if (extension == ".json")
+                {
+                    // Opcje deserializacji (ignorowanie wielkości liter dla pewności)
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
 
-                return response?.Choices?[0]?.Message?.Content ?? "No code found in history file.";
+                    // 1. Próba deserializacji jako OpenAI
+                    try
+                    {
+                        var openAiResponse = JsonSerializer.Deserialize<OpenAiResponse>(content, options);
+                        if (openAiResponse?.Choices != null && openAiResponse.Choices.Count > 0)
+                        {
+                            return openAiResponse.Choices[0].Message.Content;
+                        }
+                    }
+                    catch { /* To nie jest format OpenAI, idziemy dalej */ }
+
+                    // 2. Próba deserializacji jako Gemini
+                    try
+                    {
+                        var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(content, options);
+                        if (geminiResponse?.Candidates != null && geminiResponse.Candidates.Count > 0)
+                        {
+                            // Ścieżka do tekstu w Gemini: Candidates[0] -> Content -> Parts[0] -> Text
+                            var candidate = geminiResponse.Candidates[0];
+                            if (candidate.Content?.Parts != null && candidate.Content.Parts.Count > 0)
+                            {
+                                return candidate.Content.Parts[0].Text;
+                            }
+                        }
+                    }
+                    catch { /* To nie jest format Gemini, idziemy dalej */ }
+                }
+
+                // Domyślnie: Zwróć surową zawartość (dla plików .cpp, .cs lub nierozpoznanych JSON-ów)
+                return content;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return $"Error reading history: {ex.Message}";
             }

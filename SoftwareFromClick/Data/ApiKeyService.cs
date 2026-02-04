@@ -96,6 +96,38 @@ namespace SoftwareFromClick.Data
             }
             return provider;
         }
+        public List<Provider> GetProviders()
+        {
+            using (var context = new AppDbContext())
+            {
+                // Sprawdź i dodaj domyślnych dostawców, jeśli baza jest pusta
+                EnsureDefaultProviders(context);
+
+                return context.Providers.OrderBy(p => p.Name).ToList();
+            }
+        }
+
+        private void EnsureDefaultProviders(AppDbContext context)
+        {
+            // Lista domyślnych dostawców
+            var defaults = new List<Provider>
+            {
+                new Provider { Name = "OpenAI", Url = "https://api.openai.com/v1/chat/completions" },
+                new Provider { Name = "Gemini", Url = "https://generativelanguage.googleapis.com/v1beta/models" }
+            };
+
+            bool changed = false;
+            foreach (var def in defaults)
+            {
+                if (!context.Providers.Any(p => p.Name == def.Name))
+                {
+                    context.Providers.Add(def);
+                    changed = true;
+                }
+            }
+
+            if (changed) context.SaveChanges();
+        }
 
     }
 }

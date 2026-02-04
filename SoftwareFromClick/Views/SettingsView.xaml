@@ -25,9 +25,11 @@
             <StackPanel Grid.Column="0" Margin="0,0,10,0">
                 <TextBlock Text="Provider:" Margin="0,0,0,5"/>
                 <Border BorderBrush="Black" BorderThickness="1">
-                    <ComboBox x:Name="ProviderComboBox" Height="22" BorderThickness="0">
-                        <ComboBoxItem Content="OpenAI (GPT)" IsSelected="True"/>
-                    </ComboBox>
+                    <ComboBox x:Name="ProviderComboBox" 
+                              Height="22" 
+                              BorderThickness="0"
+                              DisplayMemberPath="Name" 
+                              SelectedValuePath="Name"/>
                 </Border>
             </StackPanel>
 
